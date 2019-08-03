@@ -39,9 +39,13 @@
                (let [col-pos (* x tile-size)
                      col (. tiles x)]
                  (for [y 0 (# col)]
-                      (: sprite-batch :add
-                         (. col y) col-pos (* y tile-size))))))
-      (build-sprite-batch)
+                      (let [row-pos (* y tile-size)]
+                        (var cell (. col y))
+                        (when (= cell closed-door-quad)
+                          (when (. (. doors-state x) y)
+                            (set cell open-door-quad)
+                            (: sprite-batch :add empty-quad col-pos row-pos)))
+                        (: sprite-batch :add cell col-pos row-pos))))))
       (for [x 0 (# tiles)]
            (let [col (. tiles x)]
              (for [y 0 (# col)]
@@ -50,6 +54,22 @@
                       (when (not (. doors-state x))
                         (table.insert doors-state x []))
                       (table.insert (. doors-state x) y false))))))
+      (build-sprite-batch)
+      (fn door? [x y]
+          (let [cell (. (. tiles x) y)]
+            (and (not (= cell wall-quad)) (not (= cell empty-quad)))))
+      (fn toggle-door [x y open]
+          (let [col (. doors-state x)
+                current-state (. col y)
+                new-state
+                (if (= open nil)
+                    (not current-state)
+                    (= open true)
+                    true
+                    false)]
+            (tset col y new-state)
+            (build-sprite-batch)
+            new-state))
       (fn traversable? [x y]
           (if (or (< x 0) (< y 0))
               false
@@ -59,10 +79,14 @@
               false
               (= (. (. tiles x) y) wall-quad)
               false
-              (not (= (. (. tiles x) y) empty-quad))
+              (door? x y)
               (. (. doors-state x) y)
               true))
+      ;; (fn describe [x y]
+      ;;     (when (door? x y)
       {:draw (fn draw [] (love.graphics.draw sprite-batch))
+       :door? door?
+       :toggle-door toggle-door
        :traversable? traversable?
        :initial-pos (fn initial-pos []
                         (let [pos-x (math.random width)
@@ -70,4 +94,5 @@
                           (if (traversable? pos-x pos-y)
                               [pos-x pos-y]
                               (initial-pos))))
+       :describe (fn [] "")
              }))

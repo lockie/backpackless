@@ -12,13 +12,15 @@
                (love.graphics.print
                 (player.describe)
                 0 (- (love.graphics.getHeight) status-font-size)))
-     :set-status-message (fn set-status-message [message]
-                             (set status-message message))
-     :update-status-message (fn update-status-message [message]
+     :init-status-message (fn init-status-message []
+                              (set status-message
+                                   (let [[x y] (player.pos)]
+                                     (dungeon.describe x y))))
+     :update-status-message (fn update-status-message [message prepend]
                                 (let [new-status-message
-                                      (.. status-message
+                                      (.. (if prepend message status-message)
                                           (if (= status-message "") "" " ")
-                                          message)]
+                                          (if prepend status-message message))]
                                   (if (> (# new-status-message) 85)
                                       (set status-message message)
                                       (set status-message new-status-message))))
