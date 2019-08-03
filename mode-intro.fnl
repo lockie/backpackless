@@ -1,16 +1,24 @@
+(local title-font (love.graphics.newFont "assets/8bitlimr.ttf" 36))
+(local font (love.graphics.newFont "assets/8bitlimr.ttf" 18))
+
+
+(local messages (lume.split (love.filesystem.read "assets/text/splash.txt") "\n"))
 
 (var counter 0)
-(var time 0)
 
-{:draw (fn draw [message]
-           (love.graphics.print (: "This window should close in %0.2f seconds"
-                                 :format (- 3 time)) 32 16))
+{:draw (fn draw []
+           (love.graphics.setFont title-font)
+           (love.graphics.print "Backpackless" 32 16)
+           (love.graphics.setFont font)
+           (for [i 1 (# messages)]
+                (when (> counter (* i 2))
+                  (love.graphics.print (. messages i) 8 (+ (* 18 i) 110))))
+           (when (> counter 4)
+             (love.graphics.print "PRESS SPACE TO CONTINUE" 32 500)))
  :update (fn update [dt set-mode]
-             (if (< counter 65535)
-                 (set counter (+ counter 1))
-                 (set counter 0))
-             (set time (+ time dt))
-             (when (> time 3)
-               (love.event.quit)))
+             (set counter (+ counter dt)))
  :keypressed (fn keypressed [key set-mode]
-                 (love.event.quit))}
+                 (when (= key "space")
+                   (set counter (if (> counter (* 2 (# messages)))
+                                    (set-mode :play)
+                                    (* 2 (math.ceil (/ counter 2)))))))}

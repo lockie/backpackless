@@ -13,6 +13,7 @@
       (mode.activate ...)))
 
 (fn love.load []
+    (love.window.setTitle "Backpackless")
     (: canvas :setFilter "nearest" "nearest")
     (repl.start))
 

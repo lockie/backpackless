@@ -6,7 +6,9 @@ COMPILED := $(patsubst %.fnl,%.lua,$(SOURCES))
 %.lua: %.fnl
 	fennel --compile --correlate $< > $@
 
-all: releases/backpackless-win32.zip releases/backpackless-$(VERSION)_all.deb
+all: $(COMPILED)
+
+release: releases/backpackless-win32.zip releases/backpackless-$(VERSION)_all.deb
 
 releases/backpackless-win32.zip: $(COMPILED)
 	love-release -W32
@@ -28,4 +30,4 @@ count:
 clean:
 	rm -rf $(COMPILED) releases
 
-.PHONY: clean upload upload-windows upload-linux
+.PHONY: clean upload upload-windows upload-linux release
