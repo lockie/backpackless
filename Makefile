@@ -6,13 +6,21 @@ COMPILED := $(patsubst %.fnl,%.lua,$(SOURCES))
 %.lua: %.fnl
 	fennel --compile --correlate $< > $@
 
-all: releases/backpackess-win32.zip releases/backpackless-$(VERSION)_all.deb
+all: releases/backpackless-win32.zip releases/backpackless-$(VERSION)_all.deb
 
-releases/backpackess-win32.zip: $(COMPILED)
+releases/backpackless-win32.zip: $(COMPILED)
 	love-release -W32
 
 releases/backpackless-$(VERSION)_all.deb: $(COMPILED)
 	love-release -D -v $(VERSION)
+
+upload-windows: releases/backpackless-win32.zip
+	butler push $^ awkravchuk/backpackless:windows --userversion $(VERSION)
+
+upload-linux:  releases/backpackless-$(VERSION)_all.deb
+	butler push $^ awkravchuk/backpackless:linux --userversion $(VERSION)
+
+upload: upload-windows upload-linux
 
 count:
 	cloc *.fnl --force-lang=clojure
@@ -20,4 +28,4 @@ count:
 clean:
 	rm -rf $(COMPILED) releases
 
-.PHONY: clean
+.PHONY: clean upload upload-windows upload-linux
