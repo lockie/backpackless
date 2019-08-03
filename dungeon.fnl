@@ -2,6 +2,8 @@
 
 (local tile-size 16)
 (local message-area-height 36)
+(local door-open-sound (love.audio.newSource "assets/sounds/door-open.ogg" "static"))
+(local door-close-sound (love.audio.newSource "assets/sounds/door-close.ogg" "static"))
 
 (fn generate-dungeon []
     (let [astray (require "lib.astray.astray")
@@ -68,6 +70,10 @@
                     (= open true)
                     true
                     false)]
+            (when (not (= current-state new-state))
+              (if new-state
+                  (: door-open-sound :play)
+                  (: door-close-sound :play)))
             (tset col y new-state)
             (build-sprite-batch)
             new-state))
