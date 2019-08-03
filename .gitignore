@@ -98,3 +98,4 @@ luac.out
 # End of https://www.gitignore.io/api/lua,emacs
 
 releases/
+*.lua
