@@ -1,5 +1,5 @@
 function love.conf(t)
-   t.window.width, t.window.height = 784, 592
+   t.window.width, t.window.height = 800, 600
    t.releases = {
       title = 'backpackless',
       package = 'backpackless',

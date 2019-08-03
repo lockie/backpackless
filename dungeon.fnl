@@ -1,11 +1,14 @@
 
 (local tile-size 16)
+(local message-area-height 36)
 
 (fn generate-dungeon []
     (let [astray (require "lib.astray.astray")
           generator (: astray :new
                        (math.floor (/ (love.graphics.getWidth) tile-size 2))
-                       (math.floor (/ (love.graphics.getHeight) tile-size 2))
+                       (math.floor (/
+                                    (- (love.graphics.getHeight) message-area-height)
+                                    tile-size 2))
                        10  ;; changeDirectionModifier
                        30  ;; sparsenessModifier
                        )

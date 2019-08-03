@@ -2,7 +2,7 @@
 (local tile-size 16)
 (local animation-duration 1)
 
-(fn create-player [dungeon]
+(fn create-player [dungeon messaging]
     (fn load-sprites [image y-offset]
         (let [image-width (: image :getWidth)
               image-height (: image :getHeight)
@@ -22,7 +22,9 @@
       (var current-pos-x intial-pos-x)
       (var current-pos-y initial-pos-y)
       (var current-time 0)
-      (var current-direction 1)
+      (var current-direction 3)
+      (fn update-status-message [message]
+          ((. (messaging) :update-status-message) message))
       (fn move [direction]
           (var new-pos-x current-pos-x)
           (var new-pos-y current-pos-y)
@@ -39,8 +41,7 @@
               (do
                (set current-pos-x new-pos-x)
                (set current-pos-y new-pos-y))
-              ;; TODO : proper messaging system
-              (print "You cannot go there.")))
+              (update-status-message "You cannot go there.")))
       {:update (fn update [dt]
                    (set current-time (+ current-time dt))
                    (when (>= current-time animation-duration)
@@ -63,5 +64,7 @@
                            (move 3)
                            (or (= key "left") (= key "a") (= key "h"))
                            (move 4)))
+       :describe (fn describe [key]
+                     "some player status information")
        }))
 
