@@ -12,6 +12,7 @@ release: releases/backpackless-win32.zip releases/backpackless-$(VERSION)_all.de
 
 releases/backpackless-win32.zip: $(COMPILED)
 	love-release -W32
+	zip -d $@ "backpackless-win32/lovec.exe"
 
 releases/backpackless-$(VERSION)_all.deb: $(COMPILED)
 	love-release -D -v $(VERSION)
