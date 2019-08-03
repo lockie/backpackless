@@ -5,7 +5,7 @@
 (var scale 1)
 
 ;; set the first mode
-(var mode (require "mode-intro"))
+(var mode (require "intro"))
 
 (fn set-mode [mode-name ...]
     (set mode (require mode-name))
