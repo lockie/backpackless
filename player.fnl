@@ -1,11 +1,12 @@
 (local lume (require "lib.lume"))
+(local light (require "shadows.Light"))
 (local utils (require "utils"))
 
 (local tile-size 16)
 (local animation-duration 1)
 (local footstep-sounds [])
 
-(fn create-player [dungeon messaging update-world]
+(fn create-player [light-world dungeon messaging update-world]
     (for [i 1 8]
          (table.insert
           footstep-sounds i
@@ -26,9 +27,15 @@
           east-dir (load-sprites sprite-sheet (* tile-size 2))
           north-dir (load-sprites sprite-sheet (* tile-size 3))
           directions [north-dir east-dir south-dir west-dir]
-          [intial-pos-x initial-pos-y] (dungeon.initial-pos)]
+          [intial-pos-x initial-pos-y] (dungeon.initial-pos)
+          player-light (: light :new light-world (* 6 tile-size))]
       (var current-pos-x intial-pos-x)
       (var current-pos-y initial-pos-y)
+      (fn sync-light []
+          (: player-light :SetPosition
+             (* current-pos-x tile-size)
+             (* current-pos-y tile-size)))
+      (sync-light)
       (var current-time 0)
       (var current-direction 3)
       (fn update-status-message [message prepend]
@@ -39,10 +46,11 @@
                 (utils.advance current-pos-x current-pos-y direction)]
             (if (dungeon.traversable? new-pos-x new-pos-y)
                 (do
-                 (: (. footstep-sounds (math.random 1 8)) :play)
-                 (set current-pos-x new-pos-x)
-                 (set current-pos-y new-pos-y)
-                 (update-world))
+                  (: (. footstep-sounds (math.random 1 8)) :play)
+                  (set current-pos-x new-pos-x)
+                  (set current-pos-y new-pos-y)
+                  (sync-light)
+                  (update-world))
                 (update-status-message "You cannot go there."))))
       (fn toggle-door [open]
           (let [[door-pos-x door-pos-y]
