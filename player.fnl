@@ -1,10 +1,16 @@
-
+(local lume (require "lib.lume"))
 (local utils (require "utils"))
 
 (local tile-size 16)
 (local animation-duration 1)
+(local footstep-sounds [])
 
 (fn create-player [dungeon messaging update-world]
+    (for [i 1 8]
+         (table.insert
+          footstep-sounds i
+          (love.audio.newSource
+           (lume.format "assets/sounds/stepdirt_{i}.ogg" {:i i}) "static")))
     (fn load-sprites [image y-offset]
         (let [image-width (: image :getWidth)
               image-height (: image :getHeight)
@@ -33,6 +39,7 @@
                 (utils.advance current-pos-x current-pos-y direction)]
             (if (dungeon.traversable? new-pos-x new-pos-y)
                 (do
+                 (: (. footstep-sounds (math.random 1 8)) :play)
                  (set current-pos-x new-pos-x)
                  (set current-pos-y new-pos-y)
                  (update-world))
@@ -78,4 +85,3 @@
                      [[0.26 0.16 0.18 1]
                       (.. "facing " (utils.direction-description current-direction))])
        }))
-
