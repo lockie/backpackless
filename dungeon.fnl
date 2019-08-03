@@ -1,3 +1,4 @@
+(local utils (require "utils"))
 
 (local tile-size 16)
 (local message-area-height 36)
@@ -82,8 +83,21 @@
               (door? x y)
               (. (. doors-state x) y)
               true))
-      ;; (fn describe [x y]
-      ;;     (when (door? x y)
+      (fn describe [x y]
+          (var result "")
+          (for [dir 1 4]
+               (let [[cell-x cell-y] (utils.advance x y dir)]
+                 (when (door? cell-x cell-y)
+                   (set result
+                        (..
+                         result
+                         (if (= result "") "" " ")
+                         "There is "
+                         (if (. (. doors-state cell-x) cell-y) "an open" "a closed")
+                         " door to the "
+                         (utils.direction-description dir)
+                         ".")))))
+          result)
       {:draw (fn draw [] (love.graphics.draw sprite-batch))
        :door? door?
        :toggle-door toggle-door
@@ -94,5 +108,5 @@
                           (if (traversable? pos-x pos-y)
                               [pos-x pos-y]
                               (initial-pos))))
-       :describe (fn [] "")
+       :describe describe
              }))

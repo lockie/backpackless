@@ -75,6 +75,7 @@
                            (toggle-door false)))
        :pos (fn pos [] [current-pos-x current-pos-y])
        :describe (fn describe [key]
-                     "some player status information")
+                     [[0.26 0.16 0.18 1]
+                      (.. "facing " (utils.direction-description current-direction))])
        }))
 
