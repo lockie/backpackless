@@ -1,3 +1,4 @@
+(local lume (require "lib.lume"))
 (local utils (require "utils"))
 
 (local tile-size 16)
@@ -89,6 +90,12 @@
               (door? x y)
               (. (. doors-state x) y)
               true))
+      (fn dead-ends []
+          (lume.map
+           (: dungeon :DeadEndCellLocations)
+           (fn [cell]
+               [(+ (* (. cell :X) 2) 1)
+                (+ (* (. cell :Y) 2) 1)])))
       (fn describe [x y]
           (var result "")
           (for [dir 1 4]
@@ -105,6 +112,8 @@
                          ".")))))
           result)
       {:draw (fn draw [] (love.graphics.draw sprite-batch))
+       :width (fn [] width)
+       :height (fn [] height)
        :door? door?
        :toggle-door toggle-door
        :traversable? traversable?
@@ -114,5 +123,6 @@
                           (if (traversable? pos-x pos-y)
                               [pos-x pos-y]
                               (initial-pos))))
+       :dead-ends dead-ends
        :describe describe
              }))

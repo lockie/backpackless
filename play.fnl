@@ -5,6 +5,7 @@
 (var dungeon nil)
 (var player nil)
 (var messaging nil)
+(var items nil)
 
 (fn update-world []
     (messaging.init-status-message))
@@ -21,13 +22,17 @@
                        dungeon
                        (fn [] messaging)
                        update-world))))
+             (when (not items)
+               (let [setup-items (require "items")]
+                 (set items (setup-items dungeon))))
              (when (not messaging)
                (let [setup-messages (require "messages")]
-                 (set messaging (setup-messages dungeon player))))
+                 (set messaging (setup-messages dungeon player items))))
              (player.update dt)
              (: current-light-world :Update))
  :draw (fn draw []
            (dungeon.draw)
+           (items.draw)
            (player.draw)
            (: current-light-world :Draw)
            (messaging.draw))
