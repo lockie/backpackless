@@ -6,7 +6,7 @@
 (local animation-duration 1)
 (local footstep-sounds [])
 
-(fn create-player [light-world dungeon messaging update-world]
+(fn create-player [light-world dungeon items inventory messaging update-world]
     (for [i 1 8]
          (table.insert
           footstep-sounds i
@@ -62,6 +62,30 @@
                    (update-world)
                    (update-status-message
                     (.. "You " (if new-door-status "open" "close") " the door.") true))))))
+      (fn item-title [item]
+          (. (. item 1) :title))
+      (fn take-item []
+          (let [item (items.item-at current-pos-x current-pos-y)]
+            (if (not item)
+                (update-status-message "There is nothing here.")
+                (if (not (inventory.take current-pos-x current-pos-y))
+                    (update-status-message "You are overburdened.")
+                    (update-status-message (.. "You take the " (item-title item) "."))))))
+      (fn throw-item []
+          (let [item (inventory.throw current-pos-x current-pos-y)]
+            (if (not item)
+                (update-status-message "You got nothing to throw.")
+                (update-status-message (.. "You throw the " (item-title item) " away.")))))
+      (fn equip-item []
+          (let [item (inventory.equip)]
+            (if (not item)
+                (update-status-message "You cannot equip that.")
+                (update-status-message (.. "You equip the " (item-title item) ".")))))
+      (fn unequip-item []
+          (let [item (inventory.unequip)]
+            (if (not item)
+                (update-status-message "You got nothing to unequip.")
+                (update-status-message (.. "You unequip the " (item-title item) ".")))))
       {:update (fn update [dt]
                    (set current-time (+ current-time dt))
                    (when (>= current-time animation-duration)
@@ -87,9 +111,20 @@
                            (= key "o")
                            (toggle-door true)
                            (= key "c")
-                           (toggle-door false)))
+                           (toggle-door false)
+                           (= key "g")
+                           (take-item)
+                           (or (= key "backspace") (= key "t"))
+                           (throw-item)
+                           (= key "e")
+                           (equip-item)
+                           (= key "u")
+                           (unequip-item)
+                           ))
        :pos (fn pos [] [current-pos-x current-pos-y])
        :describe (fn describe [key]
-                     [[0.26 0.16 0.18 1]
-                      (.. "facing " (utils.direction-description current-direction))])
+                     (lume.concat
+                      [[0.26 0.16 0.18 1]
+                       (.. "facing " (utils.direction-description current-direction) " ")]
+                      (inventory.describe)))
        }))

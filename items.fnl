@@ -60,21 +60,8 @@
                   durability
                   (math.max
                     (math.random max-durability)
-                    (math.random max-durability)
                     (math.random max-durability))]
               [item durability])))
-      (lume.each
-       (dungeon.dead-ends)
-       (fn [dead-end]
-           (let [[x y] dead-end]
-             (when (not (. items x))
-               (table.insert items x []))
-             (table.insert (. items x) y
-                           (generate-item
-                            {:single-handed-weapon 0.30
-                             :double-handed-weapon 0.20
-                             :armor 0.30
-                             :shield 0.20})))))
       (fn build-sprite-batch []
           (: sprite-batch :clear)
           (for [x 0 (dungeon.width)]
@@ -86,20 +73,45 @@
                           (when item
                             (: sprite-batch :add
                                (. (. item 1) :quad) col-pos (* y tile-size)))))))))
+      (fn set-item-at [x y item rebuild]
+          (when (not (. items x))
+            (table.insert items x []))
+          (table.insert (. items x) y item)
+          (when rebuild
+            (build-sprite-batch)))
+      (lume.each
+       (dungeon.dead-ends)
+       (fn [dead-end]
+           (let [[x y] dead-end]
+             (set-item-at
+              x y
+              (generate-item
+               {:single-handed-weapon 0.30
+                :double-handed-weapon 0.20
+                :armor 0.30
+                :shield 0.20})))))
       (build-sprite-batch)
+      (fn item-at [x y]
+          (let [col (. items x)]
+            (if col
+                (. col y)
+                nil)))
       (fn describe [x y]
           (fn with-article [title]
               (if (: "eyuioa" :find (: title :sub 1 1))
                   (.. "an " title)
                   (.. "a " title)))
-          (let [col (. items x)]
-            (if col
-                (let [item (. col y)]
-                  (if item
-                      (lume.format "There is {it} lying here."
-                                   {:it (with-article (. (. item 1) :title))})
-                      ""))
+          (let [item (item-at x y)]
+            (if item
+                (lume.format "There is {it} lying here."
+                             {:it (with-article (. (. item 1) :title))})
                 "")))
+      (fn remove-item [x y]
+          (tset (. items x) y nil)
+          (build-sprite-batch))
       {:draw (fn [] (love.graphics.draw sprite-batch))
        :describe describe
+       :item-at item-at
+       :set-item-at set-item-at
+       :remove-item remove-item
        }))
