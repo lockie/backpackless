@@ -1,7 +1,16 @@
 
 (local direction-descriptions ["north" "east" "south" "west"])
 
-{:string-pad (fn [str num char]
+{:describe-hp (fn [hp max-hp]
+                  (if (> hp (* 0.80 max-hp))
+                      ""
+                      (> hp (* 0.60 max-hp))
+                      "lightly wounded"
+                      (> hp (* 0.40 max-hp))
+                      "wounded"
+                      (> hp (* 0.20 max-hp))
+                      "gravely wounded"))
+ :string-pad (fn [str num char]
                  (let [c (if char char " ")]
                    (.. str (string.rep c (- num (# str))))))
  :advance

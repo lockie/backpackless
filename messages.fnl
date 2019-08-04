@@ -2,7 +2,7 @@
 (local status-font-size 18)
 (local status-font (love.graphics.newFont "assets/november.ttf" status-font-size))
 
-(fn setup-messages [dungeon player items]
+(fn setup-messages [dungeon player items mobs]
     (var status-message "")
     {:draw (fn draw []
                (love.graphics.setFont status-font)
@@ -16,10 +16,13 @@
                               (set status-message
                                    (let [[x y] (player.pos)
                                          dungeon-description (dungeon.describe x y)
+                                         mobs-description (mobs.describe x y)
                                          item-description (items.describe x y)]
                                      (..
                                       dungeon-description
                                       (if (= dungeon-description "") "" " ")
+                                      mobs-description
+                                      (if (= mobs-description "") "" " ")
                                       item-description))))
      :update-status-message (fn update-status-message [message prepend]
                                 (let [new-status-message

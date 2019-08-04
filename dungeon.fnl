@@ -94,8 +94,15 @@
           (lume.map
            (: dungeon :DeadEndCellLocations)
            (fn [cell]
-               [(+ (* (. cell :X) 2) 1)
-                (+ (* (. cell :Y) 2) 1)])))
+               [(+ (* cell.X 2) 1)
+                (+ (* cell.Y 2) 1)])))
+      (fn rooms []
+          (lume.map
+           dungeon.rooms
+           (fn [room]
+               (let [bounds room.bounds]
+                 [(+ (* bounds.X 2) 1)
+                  (+ (* bounds.Y 2) 1)]))))
       (fn describe [x y]
           (var result "")
           (for [dir 1 4]
@@ -124,5 +131,6 @@
                               [pos-x pos-y]
                               (initial-pos))))
        :dead-ends dead-ends
+       :rooms rooms
        :describe describe
              }))

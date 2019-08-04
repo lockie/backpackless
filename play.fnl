@@ -7,8 +7,10 @@
 (var messaging nil)
 (var items nil)
 (var inventory nil)
+(var mobs nil)
 
 (fn update-world []
+    (mobs.update-world)
     (messaging.init-status-message))
 
 {:update (fn update [dt set-mode]
@@ -29,17 +31,23 @@
                        dungeon
                        items
                        inventory
+                       (fn [] mobs)
                        (fn [] messaging)
                        update-world))))
+             (when (not mobs)
+               (let [setup-mobs (require "mobs")]
+                 (set mobs (setup-mobs dungeon (fn [] (player.pos))))))
              (when (not messaging)
                (let [setup-messages (require "messages")]
-                 (set messaging (setup-messages dungeon player items))
+                 (set messaging (setup-messages dungeon player items mobs))
                  (messaging.update-status-message "You enter the dungeon. Press ? for help.")))
              (player.update dt)
+             (mobs.update dt)
              (: current-light-world :Update))
  :draw (fn draw []
            (dungeon.draw)
            (items.draw)
+           (mobs.draw)
            (player.draw)
            (: current-light-world :Draw)
            (messaging.draw))

@@ -6,7 +6,7 @@
 (local animation-duration 1)
 (local footstep-sounds [])
 
-(fn create-player [light-world dungeon items inventory messaging update-world]
+(fn create-player [light-world dungeon items inventory mobs messaging update-world]
     (for [i 1 8]
          (tset
           footstep-sounds i
@@ -44,7 +44,9 @@
           (set current-direction direction)
           (let [[new-pos-x new-pos-y]
                 (utils.advance current-pos-x current-pos-y direction)]
-            (if (dungeon.traversable? new-pos-x new-pos-y)
+            (if (and (dungeon.traversable? new-pos-x new-pos-y)
+                     ;; TODO : attack instead of going on mob
+                     (not ((. (mobs) :mob-at) new-pos-x new-pos-y)))
                 (do
                   (: (. footstep-sounds (math.random 1 8)) :play)
                   (set current-pos-x new-pos-x)
