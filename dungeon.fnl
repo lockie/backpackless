@@ -56,8 +56,8 @@
                   (let [cell (. col y)]
                     (when (and (not (= cell wall-quad)) (not (= cell empty-quad)))
                       (when (not (. doors-state x))
-                        (table.insert doors-state x []))
-                      (table.insert (. doors-state x) y false))))))
+                        (tset doors-state x []))
+                      (tset (. doors-state x) y false))))))
       (build-sprite-batch)
       (fn door? [x y]
           (let [cell (. (. tiles x) y)]

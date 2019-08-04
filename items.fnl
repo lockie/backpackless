@@ -75,8 +75,8 @@
                                (. (. item 1) :quad) col-pos (* y tile-size)))))))))
       (fn set-item-at [x y item rebuild]
           (when (not (. items x))
-            (table.insert items x []))
-          (table.insert (. items x) y item)
+            (tset items x []))
+          (tset (. items x) y item)
           (when rebuild
             (build-sprite-batch)))
       (lume.each

@@ -8,7 +8,7 @@
 
 (fn create-player [light-world dungeon items inventory messaging update-world]
     (for [i 1 8]
-         (table.insert
+         (tset
           footstep-sounds i
           (love.audio.newSource
            (lume.format "assets/sounds/stepdirt_{i}.ogg" {:i i}) "static")))
