@@ -1,7 +1,10 @@
 
 (local direction-descriptions ["north" "east" "south" "west"])
 
-{:advance
+{:string-pad (fn [str num char]
+                 (let [c (if char char " ")]
+                   (.. str (string.rep c (- num (# str))))))
+ :advance
  (fn [pos-x pos-y direction]
      (var new-pos-x pos-x)
      (var new-pos-y pos-y)

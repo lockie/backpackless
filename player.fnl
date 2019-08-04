@@ -125,6 +125,9 @@
        :describe (fn describe [key]
                      (lume.concat
                       [[0.26 0.16 0.18 1]
-                       (.. "facing " (utils.direction-description current-direction) " ")]
+                       (..
+                        "facing "
+                        (utils.string-pad (utils.direction-description current-direction) 5)
+                        " ")]
                       (inventory.describe)))
        }))
