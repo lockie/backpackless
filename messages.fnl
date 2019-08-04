@@ -1,6 +1,6 @@
 
 (local status-font-size 18)
-(local status-font (love.graphics.newFont "assets/dpcomic.regular.ttf" status-font-size))
+(local status-font (love.graphics.newFont "assets/november.ttf" status-font-size))
 
 (fn setup-messages [dungeon player items]
     (var status-message "")
@@ -26,7 +26,7 @@
                                       (.. (if prepend message status-message)
                                           (if (= status-message "") "" " ")
                                           (if prepend status-message message))]
-                                  (if (> (# new-status-message) 100)
+                                  (if (> (# new-status-message) 80)
                                       (set status-message message)
                                       (set status-message new-status-message))))
      })
