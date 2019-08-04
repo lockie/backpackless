@@ -1,0 +1,21 @@
+                  CONTROLS
+arrows / wasd / hjkl : movement
+                   o : open door
+                   c : close door
+                   g : get item from the ground
+       t / backspace : throw item away
+                   e : equip item
+                   u : unequip item
+
+                   TARGET
+            Kill all the monsters.
+
+               DAMAGE NUMBERS
+2d6^+3 means roll 2 6-sided die with 3 rerolls.
+
+               SPECIFICITIES
+You can carry only one item. When dual wielding,
+          you cannot carry anything.
+
+
+           Press any key to continue

@@ -33,7 +33,8 @@
                        update-world))))
              (when (not messaging)
                (let [setup-messages (require "messages")]
-                 (set messaging (setup-messages dungeon player items))))
+                 (set messaging (setup-messages dungeon player items))
+                 (messaging.update-status-message "You enter the dungeon. Press ? for help.")))
              (player.update dt)
              (: current-light-world :Update))
  :draw (fn draw []
@@ -43,4 +44,6 @@
            (: current-light-world :Draw)
            (messaging.draw))
  :keypressed (fn keypressed [key set-mode]
-                 (player.keypressed key))}
+                 (if (or (= key "/") (= key "?"))
+                     (set-mode :help)
+                     (player.keypressed key)))}
