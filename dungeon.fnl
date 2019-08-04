@@ -19,7 +19,7 @@
           dungeon (: generator :Generate)
           width (* 2 (: dungeon :getWidth))
           height (* 2 (: dungeon :getHeight))
-          tile-set (love.graphics.newImage "assets/images/dungeon-tiles.png")
+          tile-set (love.graphics.newImage "assets/images/dungeon.png")
           tile-set-width (: tile-set :getWidth)
           tile-set-height (: tile-set :getHeight)
           sprite-batch (love.graphics.newSpriteBatch tile-set)
