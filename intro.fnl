@@ -1,5 +1,5 @@
-(local title-font (love.graphics.newFont "assets/8bitlimr.ttf" 36))
-(local font (love.graphics.newFont "assets/8bitlimr.ttf" 18))
+(local title-font (love.graphics.newFont "assets/dpcomic.regular.ttf" 36))
+(local font (love.graphics.newFont "assets/dpcomic.regular.ttf" 18))
 
 
 (local messages (lume.split (love.filesystem.read "assets/text/splash.txt") "\n"))
