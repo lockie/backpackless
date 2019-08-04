@@ -29,7 +29,7 @@
 
 (local mob-classes [demon spider slime zombie])
 
-(fn setup-mobs [dungeon player-position combat update-status-message]
+(fn setup-mobs [dungeon player-position combat items update-status-message]
     (let [sprite-batch (love.graphics.newSpriteBatch tile-set)
           mobs []  ;; [int][int] -> mob class + HP
           ]
@@ -75,7 +75,7 @@
                (when (and (not (= x player-x)) (not (= y player-y)) (not (mob-at x y)))
                  (set-mob-at
                   x y
-                  (generate-mob {spider 0.80 slime 0.20}))))))
+                  (generate-mob {spider 0.95 slime 0.05}))))))
         (lume.each
          (dungeon.rooms)
          (fn [room]
@@ -160,7 +160,7 @@
                                   (do
                                    (update-status-message
                                     (.. "The " (. (. mob 1) :title) " dies."))
-                                   ;; TODO : drop
+                                   (items.monster-drop x y)
                                    (remove-mob x y))
                                   (set mob-count (+ mob-count 1)))))))))))
       (fn update [dt]

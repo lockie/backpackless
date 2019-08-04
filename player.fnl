@@ -69,9 +69,9 @@
           (set current-direction direction)
           (let [[new-pos-x new-pos-y]
                 (utils.advance current-pos-x current-pos-y direction)]
-            (if (and (dungeon.traversable? new-pos-x new-pos-y)
-                     ;; TODO : attack instead of going on mob
-                     (not ((. (mobs) :mob-at) new-pos-x new-pos-y)))
+            (if ((. (mobs) :mob-at) new-pos-x new-pos-y)
+                (attack new-pos-x new-pos-y)
+                (dungeon.traversable? new-pos-x new-pos-y)
                 (do
                   (: (. footstep-sounds (math.random 1 8)) :play)
                   (set current-pos-x new-pos-x)

@@ -25,7 +25,7 @@
                  (set items (setup-items dungeon))))
              (when (not inventory)
                (let [setup-inventory (require "inventory")]
-                 (set inventory (setup-inventory dungeon items update-status-message))))
+                 (set inventory (setup-inventory dungeon items (fn [] combat) update-status-message))))
              (when (not player)
                (let [create-player (require "player")]
                  (set player
@@ -40,7 +40,7 @@
                        update-world))))
              (when (not mobs)
                (let [setup-mobs (require "mobs")]
-                 (set mobs (setup-mobs dungeon (fn [] (player.pos)) (fn [] combat) update-status-message))))
+                 (set mobs (setup-mobs dungeon (fn [] (player.pos)) (fn [] combat) items update-status-message))))
              (when (not combat)
                (let [setup-combat (require "combat")]
                  (set combat (setup-combat inventory player mobs update-status-message))))

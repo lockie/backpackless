@@ -16,26 +16,26 @@
      :class-probability class-probability
      :class class})
 
-(local short-bow      (setup-item 0  "short bow"           "1d6"    1  0.20 :single-handed-weapon))
-(local long-bow       (setup-item 1  "long bow"            "3d6"    1  0.20 :double-handed-weapon))
-(local arrow          (setup-item 2  "arrow pack"          ""       10 0.80 :arrow))
-(local enhanced-arrow (setup-item 3  "enhanced arrow pack" ""       10 0.20 :arrow))
-(local armor          (setup-item 4  "armor"               "1d4"    30 0.80 :armor))
-(local enhanced-armor (setup-item 5  "enhanced armor"      "3d4"    50 0.20 :armor))
-(local candle         (setup-item 6  "candle"              ""       20 0.80 :light-source))
-(local lamp           (setup-item 7  "lamp"                ""       50 0.20 :light-source))
-(local long-sword     (setup-item 8  "long sword"          "3d4^+3" 50 0.40 :double-handed-weapon))
-(local halberd        (setup-item 9  "halberd"             "1d8"    50 0.25 :double-handed-weapon))
-(local hammer         (setup-item 10 "hammer"              "2d8"    50 0.15 :double-handed-weapon))
-(local short-sword    (setup-item 11 "short sword"         "1d4^+3" 30 0.30 :single-handed-weapon))
-(local axe            (setup-item 12 "axe"                 "1d4^+1" 30 0.25 :single-handed-weapon))
-(local small-potion   (setup-item 13 "small health potion" ""       1  0.50 :potion))
-(local potion         (setup-item 14 "health potion"       ""       1  0.30 :potion))
-(local large-potion   (setup-item 15 "large health potion" ""       1  0.20 :potion))
-(local scroll         (setup-item 16 "repair scroll"       ""       1  1.00 :scroll))
-(local small-shield   (setup-item 17 "small shield"        "1d6^+1" 30 0.80 :shield))
-(local large-shield   (setup-item 18 "large shield"        "3d6^+3" 50 0.20 :shield))
-(local dagger         (setup-item 19 "dagger"              "1d2^+1" 20 0.25 :single-handed-weapon))
+(local short-bow      (setup-item 0  "short bow"     "1d6"    1  0.20 :single-handed-weapon))
+(local long-bow       (setup-item 1  "long bow"      "3d6"    1  0.20 :double-handed-weapon))
+(local arrow          (setup-item 2  "arrow pack"    ""       10 0.80 :arrow))
+(local enhanced-arrow (setup-item 3  "bolts pack"    ""       10 0.20 :arrow))
+(local armor          (setup-item 4  "plate"         "1d4"    30 0.80 :armor))
+(local enhanced-armor (setup-item 5  "cuirass"       "3d4"    50 0.20 :armor))
+(local candle         (setup-item 6  "candle"        ""       20 0.80 :light-source))
+(local lamp           (setup-item 7  "lamp"          ""       50 0.20 :light-source))
+(local long-sword     (setup-item 8  "long sword"    "3d4^+3" 50 0.40 :double-handed-weapon))
+(local halberd        (setup-item 9  "halberd"       "1d8"    50 0.25 :double-handed-weapon))
+(local hammer         (setup-item 10 "hammer"        "2d8"    50 0.15 :double-handed-weapon))
+(local short-sword    (setup-item 11 "short sword"   "1d4^+3" 30 0.30 :single-handed-weapon))
+(local axe            (setup-item 12 "axe"           "1d4^+1" 30 0.25 :single-handed-weapon))
+(local small-potion   (setup-item 13 "small HP"      ""       1  0.50 :potion))
+(local potion         (setup-item 14 "HP"            ""       1  0.30 :potion))
+(local large-potion   (setup-item 15 "large HP"      ""       1  0.20 :potion))
+(local scroll         (setup-item 16 "repair scroll" ""       1  1.00 :scroll))
+(local small-shield   (setup-item 17 "small shield"  "1d6^+1" 30 0.80 :shield))
+(local large-shield   (setup-item 18 "large shield"  "3d6^+3" 50 0.20 :shield))
+(local dagger         (setup-item 19 "dagger"        "1d2^+1" 20 0.25 :single-handed-weapon))
 
 (local item-classes
        [short-bow long-bow arrow enhanced-arrow armor enhanced-armor candle lamp
@@ -109,9 +109,20 @@
       (fn remove-item [x y]
           (tset (. items x) y nil)
           (build-sprite-batch))
+      (fn monster-drop [x y]
+          (when (not (item-at x y))
+            (set-item-at
+             x y
+             (generate-item
+              {:arrow 0.35
+               :light-source 0.10
+               :potion  0.50
+               :scroll 0.05})))
+          (build-sprite-batch))
       {:draw (fn [] (love.graphics.draw sprite-batch))
        :describe describe
        :item-at item-at
        :set-item-at set-item-at
        :remove-item remove-item
+       :monster-drop monster-drop
        }))

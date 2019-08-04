@@ -38,7 +38,7 @@
            1])
         [1 1 1 1]))
 
-(fn setup-inventory [dungeon items update-status-message]
+(fn setup-inventory [dungeon items combat update-status-message]
     (var armor nil)
     (var weapon nil)
     (var item nil)
@@ -93,7 +93,16 @@
                   (= class :light-source)
                   false
                   (= class :potion)
-                  false  ;; TODO : drink potion
+                  (let [old-item item]
+                    ((. (combat) :heal-player)
+                     ;; HACK
+                     (if (= (. (item-class item) :title) "small HP")
+                         8
+                         (= (. (item-class item) :title) "HP")
+                         16
+                         32))
+                    (set item nil)
+                    old-item)
                   (= class :scroll)
                   false  ;; TODO : use scroll
                   (= class :shield)
@@ -125,27 +134,30 @@
              (when (<= (item-durability armor) 0)
                (update-status-message "Your armor breaks.")
                (set armor nil)))))
-    (fn wear-weapon [points]
-        (when weapon
-          (set-item-durability weapon (- (item-durability weapon) points))
-          (when (<= (item-durability weapon) 0)
-            (update-status-message "Your weapon breaks.")
-            (set weapon nil))))
     (fn ranged-weapon? []
         (if weapon
             (string.find (. (item-class weapon) :title) "bow") ;; HACK
             false))
+    (fn wear-weapon [points]
+        (when weapon
+          (if (ranged-weapon?)
+              (set-item-durability item (- (item-durability item) 1))
+              (do
+               (set-item-durability weapon (- (item-durability weapon) points))
+               (when (<= (item-durability weapon) 0)
+                 (update-status-message "Your weapon breaks.")
+                 (set weapon nil))))))
     {:describe (fn []
                    [[1 1 1 1]
-                    "armor: "
+                    "ARM: "
                     (item-durability-color armor)
                     (.. (full-item-description armor) " ")
                     [1 1 1 1]
-                    "weapon: "
+                    "WEAP: "
                     (item-durability-color weapon)
                     (..  (full-item-description weapon) " ")
                     [1 1 1 1]
-                    "item: "
+                    "IT: "
                     (item-durability-color item)
                     (..  (full-item-description item) " ")])
      :take take

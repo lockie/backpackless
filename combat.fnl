@@ -53,6 +53,9 @@
     (fn maybe-attack-mob [x y]
         (do-attack-mob x y))
 
+    (fn heal-player [amount]
+        (set player-hp (+ player-hp amount)))
+
     (fn update [dt set-mode]
         (when (<= player-hp 0)
           (update-status-message "You die.")
@@ -62,5 +65,6 @@
      :player-max-hp (fn [] starting-player-hp)
      :maybe-attack-player maybe-attack-player
      :maybe-attack-mob maybe-attack-mob
+     :heal-player heal-player
      :update update
      })
