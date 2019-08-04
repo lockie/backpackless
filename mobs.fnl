@@ -22,14 +22,14 @@
      :attack attack
      :defense defense})
 
-(local demon  (setup-mob 0 "demon"        16 "1d6^+1" "1d6"))
-(local spider (setup-mob 1 "giant spider" 8  "2d3^+2" "1d2"))
-(local slime  (setup-mob 2 "vile slime"   6  "1d2"    "1d6^+1"))
-(local zombie (setup-mob 3 "zombie"       10 "1d3"    "1d3"))
+(local demon  (setup-mob 0 "demon"        16 "1d4^+1" "1d4"))
+(local spider (setup-mob 1 "giant spider" 8  "2d2^+2" "1d1"))
+(local slime  (setup-mob 2 "vile slime"   6  "1d1"    "1d4^+1"))
+(local zombie (setup-mob 3 "zombie"       10 "1d2"    "1d2"))
 
 (local mob-classes [demon spider slime zombie])
 
-(fn setup-mobs [dungeon player-position]
+(fn setup-mobs [dungeon player-position combat update-status-message]
     (let [sprite-batch (love.graphics.newSpriteBatch tile-set)
           mobs []  ;; [int][int] -> mob class + HP
           ]
@@ -75,7 +75,7 @@
                (when (and (not (= x player-x)) (not (= y player-y)) (not (mob-at x y)))
                  (set-mob-at
                   x y
-                  (generate-mob {spider 0.20 slime 0.80}))))))
+                  (generate-mob {spider 0.80 slime 0.20}))))))
         (lume.each
          (dungeon.rooms)
          (fn [room]
@@ -105,9 +105,10 @@
                              (utils.direction-description dir)
                              ".")))))))
           result)
-      (fn remove-mob [x y]
+      (fn remove-mob [x y rebuild]
           (tset (. mobs x) y nil)
-          (build-sprite-batch))
+          (when rebuild
+            (build-sprite-batch)))
       (fn simulate []
           (let [[player-x player-y] (player-position)]
             (fn move-mob [x y new-x new-y]
@@ -134,6 +135,7 @@
                                     (when (or (not (= dx 0)) (not (= dy 0)))
                                       (move-mob x y new-x new-y)))
                                   (do
+                                   ((. (combat) :maybe-attack-player) x y)
                                    (var moved false)
                                    (if (> player-x x)
                                        (set moved (move-mob x y (+ x 1) y))
@@ -145,6 +147,22 @@
                                         (and (< player-y y)
                                              (not moved))
                                         (move-mob x y x (- y 1)))))))))))))
+      (fn update-state [set-mode]
+          (var mob-count 0)
+          (for [x 0 (dungeon.width)]
+               (let [col (. mobs x)]
+                 (when col
+                   (for [y 0 (dungeon.height)]
+                        (let [mob (. col y)]
+                          (when mob
+                            (let [mob-hp (. mob 2)]
+                              (if (<= mob-hp 0)
+                                  (do
+                                   (update-status-message
+                                    (.. "The " (. (. mob 1) :title) " dies."))
+                                   ;; TODO : drop
+                                   (remove-mob x y))
+                                  (set mob-count (+ mob-count 1)))))))))))
       (fn update [dt]
           (set current-time (+ current-time dt))
           (when (>= current-time animation-duration)
@@ -155,7 +173,8 @@
             (when (not (= new-stance current-stance))
               (set current-stance new-stance)
               (build-sprite-batch))))
-      (fn update-world []
+      (fn update-world [set-mode]
+          (update-state set-mode)
           (simulate)
           (build-sprite-batch))
       {:draw (fn [] (love.graphics.draw sprite-batch))

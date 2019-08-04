@@ -8,12 +8,15 @@
 (var items nil)
 (var inventory nil)
 (var mobs nil)
+(var combat nil)
 
-(fn update-world []
-    (mobs.update-world)
-    (messaging.init-status-message))
+(fn update-status-message [...]
+    (messaging.update-status-message ...))
 
 {:update (fn update [dt set-mode]
+             (fn update-world []
+                 (messaging.init-status-message)
+                 (mobs.update-world set-mode))
              (when (not dungeon)
                (let [generate-dungeon (require "dungeon")]
                  (set dungeon (generate-dungeon))))
@@ -22,7 +25,7 @@
                  (set items (setup-items dungeon))))
              (when (not inventory)
                (let [setup-inventory (require "inventory")]
-                 (set inventory (setup-inventory dungeon items))))
+                 (set inventory (setup-inventory dungeon items update-status-message))))
              (when (not player)
                (let [create-player (require "player")]
                  (set player
@@ -32,17 +35,22 @@
                        items
                        inventory
                        (fn [] mobs)
-                       (fn [] messaging)
+                       (fn [] combat)
+                       update-status-message
                        update-world))))
              (when (not mobs)
                (let [setup-mobs (require "mobs")]
-                 (set mobs (setup-mobs dungeon (fn [] (player.pos))))))
+                 (set mobs (setup-mobs dungeon (fn [] (player.pos)) (fn [] combat) update-status-message))))
+             (when (not combat)
+               (let [setup-combat (require "combat")]
+                 (set combat (setup-combat inventory player mobs update-status-message))))
              (when (not messaging)
                (let [setup-messages (require "messages")]
                  (set messaging (setup-messages dungeon player items mobs))
-                 (messaging.update-status-message "You enter the dungeon. Press ? for help.")))
+                 (update-status-message "You enter the dungeon. Press ? for help.")))
              (player.update dt)
              (mobs.update dt)
+             (combat.update dt set-mode)
              (: current-light-world :Update))
  :draw (fn draw []
            (dungeon.draw)

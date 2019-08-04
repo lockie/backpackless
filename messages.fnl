@@ -25,6 +25,7 @@
                                       (if (= mobs-description "") "" " ")
                                       item-description))))
      :update-status-message (fn update-status-message [message prepend]
+                                (print message)
                                 (let [new-status-message
                                       (.. (if prepend message status-message)
                                           (if (= status-message "") "" " ")

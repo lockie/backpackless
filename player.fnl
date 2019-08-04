@@ -6,7 +6,7 @@
 (local animation-duration 1)
 (local footstep-sounds [])
 
-(fn create-player [light-world dungeon items inventory mobs messaging update-world]
+(fn create-player [light-world dungeon items inventory mobs combat update-status-message update-world]
     (for [i 1 8]
          (tset
           footstep-sounds i
@@ -38,8 +38,33 @@
       (sync-light)
       (var current-time 0)
       (var current-direction 3)
-      (fn update-status-message [message prepend]
-          ((. (messaging) :update-status-message) message prepend))
+      (fn attack [x y]
+          (if (not (inventory.weapon-usable?))
+              (update-status-message "You cannot attack.")
+              (do
+               (var mob-x x)
+               (var mob-y y)
+                (when (not mob-x)
+                  (let [range (if (inventory.ranged-weapon?) 10 1)]
+                    (for [dir 1 4]
+                         (var visible true)
+                         (for [distance 1 range]
+                              (when visible
+                                (let [[pos-x pos-y]
+                                      (utils.advance current-pos-x current-pos-y dir distance)]
+                                  (set visible (dungeon.traversable? pos-x pos-y))
+                                  (when visible
+                                    (when ((. (mobs) :mob-at) pos-x pos-y)
+                                      (do
+                                       (set current-direction dir)
+                                       (set mob-x pos-x)
+                                       (set mob-y pos-y))))))))))
+                (if (not mob-x)
+                    (update-status-message "There is nothing to attack.")
+                    (do
+                     (update-world)
+                     (when ((. (mobs) :mob-at) mob-x mob-y)
+                         ((. (combat) :maybe-attack-mob) mob-x mob-y)))))))
       (fn move [direction]
           (set current-direction direction)
           (let [[new-pos-x new-pos-y]
@@ -122,14 +147,26 @@
                            (equip-item)
                            (= key "u")
                            (unequip-item)
+                           (= key ".")
+                           (update-world)
+                           (= key "f")
+                           (attack)
                            ))
        :pos (fn pos [] [current-pos-x current-pos-y])
        :describe (fn describe [key]
-                     (lume.concat
-                      [[0.26 0.16 0.18 1]
-                       (..
-                        "facing "
-                        (utils.string-pad (utils.direction-description current-direction) 5)
-                        " ")]
-                      (inventory.describe)))
+                     (let [cmbt (combat)
+                           hp (cmbt.player-hp)
+                           max-hp (cmbt.player-max-hp)
+                           hp-ratio (/ hp max-hp)]
+                       (lume.concat
+                        [[0.26 0.16 0.18 1]
+                         (..
+                          "facing "
+                          (utils.string-pad (utils.direction-description current-direction) 5)
+                          " ")]
+                        [[1 1 1 1]
+                         "HP: "]
+                        [[(- 1 hp-ratio) hp-ratio 0 1]
+                         (.. (tostring hp) " ")]
+                        (inventory.describe))))
        }))

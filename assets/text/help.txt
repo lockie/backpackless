@@ -6,6 +6,8 @@ arrows / wasd / hjkl : movement
        t / backspace : throw item away
                    e : equip item
                    u : unequip item
+                   f : attack closest monster
+                   . : wait
 
                    TARGET
             Kill all the monsters.

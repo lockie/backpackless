@@ -1,0 +1,31 @@
+                                        CREDITS
+
+ * Love2D framework                      * DawnLike tile set
+ https://love2d.org                      https://opengameart.org/content/
+                                         dawnlike-16x16-universal-rogue-like-tileset-v181
+ * Fennel language
+ Calvin Rose                             * Door sounds
+ https://fennel-lang.org                 Iwan Gabovitch
+                                         https://opengameart.org/content/
+ * Lume library                          door-open-door-close-set
+ https://github.com/rxi/lume
+                                         * Footstep sounds
+ * Astray library                        https://opengameart.org/content/
+ Florian Fischer                         foot-walking-step-sounds-on-stone-
+ https://github.com/SiENcE/astray        water-snow-wood-and-dirt
+
+ * RL-Dice library                       * November font
+ Timothy Torres                          Brandon Schoepf
+ https://github.com/                     https://www.1001fonts.com/november-font.html
+ timothymtorres/RL-Dice
+
+ * Shadows library
+ Matias Hermosilla
+ https://github.com/matiasah/shadows
+
+ * Love-release library
+ Antonin Decimo
+ https://github.com/MisterDA/
+ love-release
+
+                                   PRESS ESC TO EXIT
