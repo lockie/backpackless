@@ -19,11 +19,11 @@
               damage-dealt (do-attack mob-class.attack (inventory.defense))]
           (if (not damage-dealt)
               (update-status-message
-               (.. "The " mob-class.title " attacks but misses you."))
+               (.. "The " mob-class.title " misses you."))
               (do
                (update-status-message
-                (.. "The " mob-class.title " attacks dealing "
-                    damage-dealt " damage to you."))
+                (.. "The " mob-class.title " hits you with "
+                    damage-dealt " damage."))
                (inventory.wear-armor (math.random damage-dealt))
                (set player-hp (- player-hp damage-dealt))))))
 
@@ -41,11 +41,13 @@
               ranged-attack (inventory.ranged-weapon?)
               attack-text (if ranged-attack "shoot" "hit")]
           (if (not damage-dealt)
-              (update-status-message
-               (.. "You " attack-text " " mob-class.title " but miss."))
               (do
                (update-status-message
-                (.. "You " attack-text " " mob-class.title " dealing "
+                (.. "You miss " mob-class.title "."))
+               (inventory.wear-weapon 0))
+              (do
+               (update-status-message
+                (.. "You " attack-text " " mob-class.title " with "
                     damage-dealt " damage."))
                (inventory.wear-weapon (math.random damage-dealt))
                (tset mob 2 (- (. mob 2) damage-dealt))))))

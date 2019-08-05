@@ -48,23 +48,25 @@
                   (let [range (if (inventory.ranged-weapon?) 10 1)]
                     (for [dir 1 4]
                          (var visible true)
+                         (var found false)
                          (for [distance 1 range]
-                              (when visible
+                              (when (and visible (not found))
                                 (let [[pos-x pos-y]
                                       (utils.advance current-pos-x current-pos-y dir distance)]
                                   (set visible (dungeon.traversable? pos-x pos-y))
-                                  (when visible
+                                  (when (and visible (not found))
                                     (when ((. (mobs) :mob-at) pos-x pos-y)
                                       (do
                                        (set current-direction dir)
                                        (set mob-x pos-x)
-                                       (set mob-y pos-y))))))))))
+                                       (set mob-y pos-y)
+                                       (set found true))))))))))
                 (if (not mob-x)
                     (update-status-message "There is nothing to attack.")
                     (do
-                     (update-world)
                      (when ((. (mobs) :mob-at) mob-x mob-y)
-                         ((. (combat) :maybe-attack-mob) mob-x mob-y)))))))
+                       ((. (combat) :maybe-attack-mob) mob-x mob-y))
+                     (update-world true))))))
       (fn move [direction]
           (set current-direction direction)
           (let [[new-pos-x new-pos-y]

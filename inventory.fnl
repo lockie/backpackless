@@ -44,13 +44,23 @@
     (var item nil)
     (fn dual-wielding? []
         (and weapon (= (. (item-class weapon) :class) :double-handed-weapon)))
+    (fn ranged-weapon? []
+        (if weapon
+            (string.find (. (item-class weapon) :title) "bow") ;; HACK
+            false))
     (fn take [x y]
-        (if (or item (dual-wielding?))
-            false
-            (let [it (items.item-at x y)]
+        (let [it (items.item-at x y)]
+          (fn do-take []
               (items.remove-item x y)
               (set item it)
-              true)))
+              true)
+          (if item
+              false
+              (and (ranged-weapon?) (= (. (item-class it) :class) :arrow))
+              (do-take)
+              (dual-wielding?)
+              false
+              (do-take))))
     (fn throw [x y]
         (fn random-point-near []
             (let [dx (math.random -1 1)
@@ -134,14 +144,14 @@
              (when (<= (item-durability armor) 0)
                (update-status-message "Your armor breaks.")
                (set armor nil)))))
-    (fn ranged-weapon? []
-        (if weapon
-            (string.find (. (item-class weapon) :title) "bow") ;; HACK
-            false))
     (fn wear-weapon [points]
         (when weapon
           (if (ranged-weapon?)
-              (set-item-durability item (- (item-durability item) 1))
+              (do
+               (set-item-durability item (- (item-durability item) 1))
+               (when (<= (item-durability item) 0)
+                 (update-status-message "You are out of arrows.")
+                 (set item nil)))
               (do
                (set-item-durability weapon (- (item-durability weapon) points))
                (when (<= (item-durability weapon) 0)

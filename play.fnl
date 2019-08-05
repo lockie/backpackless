@@ -14,8 +14,9 @@
     (messaging.update-status-message ...))
 
 {:update (fn update [dt set-mode]
-             (fn update-world []
-                 (messaging.init-status-message)
+             (fn update-world [keep-messages]
+                 (when (not keep-messages)
+                   (messaging.init-status-message))
                  (mobs.update-world set-mode))
              (when (not dungeon)
                (let [generate-dungeon (require "dungeon")]
