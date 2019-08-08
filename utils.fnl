@@ -1,7 +1,12 @@
 
 (local direction-descriptions ["north" "east" "south" "west"])
 
-{:describe-hp (fn [hp max-hp]
+{:set-table (fn [dst src]
+                (each [k v (pairs src)]
+                      (tset dst k v)
+                      (tset src k nil)))
+ :empty? (fn [tbl] (= (next tbl) nil))
+ :describe-hp (fn [hp max-hp]
                   (if (> hp (* 0.80 max-hp))
                       ""
                       (> hp (* 0.60 max-hp))

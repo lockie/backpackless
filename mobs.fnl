@@ -135,7 +135,7 @@
                                     (when (or (not (= dx 0)) (not (= dy 0)))
                                       (move-mob x y new-x new-y)))
                                   (do
-                                   ((. (combat) :maybe-attack-player) x y)
+                                   (combat.maybe-attack-player x y)
                                    (var moved false)
                                    (if (> player-x x)
                                        (set moved (move-mob x y (+ x 1) y))

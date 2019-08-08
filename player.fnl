@@ -55,7 +55,7 @@
                                       (utils.advance current-pos-x current-pos-y dir distance)]
                                   (set visible (dungeon.traversable? pos-x pos-y))
                                   (when (and visible (not found))
-                                    (when ((. (mobs) :mob-at) pos-x pos-y)
+                                    (when (mobs.mob-at pos-x pos-y)
                                       (do
                                        (set current-direction dir)
                                        (set mob-x pos-x)
@@ -64,14 +64,14 @@
                 (if (not mob-x)
                     (update-status-message "There is nothing to attack.")
                     (do
-                     (when ((. (mobs) :mob-at) mob-x mob-y)
-                       ((. (combat) :maybe-attack-mob) mob-x mob-y))
+                     (when (mobs.mob-at mob-x mob-y)
+                       (combat.maybe-attack-mob mob-x mob-y))
                      (update-world true))))))
       (fn move [direction]
           (set current-direction direction)
           (let [[new-pos-x new-pos-y]
                 (utils.advance current-pos-x current-pos-y direction)]
-            (if ((. (mobs) :mob-at) new-pos-x new-pos-y)
+            (if (mobs.mob-at new-pos-x new-pos-y)
                 (attack new-pos-x new-pos-y)
                 (dungeon.traversable? new-pos-x new-pos-y)
                 (do
@@ -156,9 +156,8 @@
                            ))
        :pos (fn pos [] [current-pos-x current-pos-y])
        :describe (fn describe [key]
-                     (let [cmbt (combat)
-                           hp (cmbt.player-hp)
-                           max-hp (cmbt.player-max-hp)
+                     (let [hp (combat.player-hp)
+                           max-hp (combat.player-max-hp)
                            hp-ratio (/ hp max-hp)]
                        (lume.concat
                         [[0.26 0.16 0.18 1]

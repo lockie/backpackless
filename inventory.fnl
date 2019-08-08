@@ -104,7 +104,7 @@
                   false
                   (= class :potion)
                   (let [old-item item]
-                    ((. (combat) :heal-player)
+                    (combat.heal-player
                      ;; HACK
                      (if (= (. (item-class item) :title) "small HP")
                          8
