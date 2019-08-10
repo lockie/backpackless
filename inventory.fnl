@@ -1,44 +1,40 @@
 (local lume (require "lib.lume"))
 
+
 (local base-defense "1d2")
 (local base-attack  "1d2")
 
-(fn full-item-description [item]
-    (if item
-        (let [[item-class durability] item
-              title (. item-class :title)
-              dice (. item-class :dice)
-              max-dur (. item-class :durability)]
-          (if (= durability 1)
-              (lume.format "{title} {dice}" {:title title :dice dice})
-              (lume.format "{title} {dice} ({dur}/{max-dur})"
-                           {:title title
-                            :dice dice
-                            :dur durability
-                            :max-dur max-dur})))
-        "-"))
-
-(fn item-class [item]
-    (. item 1))
-
-(fn item-durability [item]
-    (. item 2))
-
-(fn set-item-durability [item durability]
-    (tset item 2 durability))
-
-(fn item-durability-color [item]
-    (if item
-        (let [[item-class durability] item
-              max-durability (. item-class :durability)
-              ratio (/ durability max-durability)]
-          [(lume.lerp 0.26 0.43 ratio)
-           (lume.lerp 0.16 0.76 ratio)
-           (lume.lerp 0.18 0.80 ratio)
-           1])
-        [1 1 1 1]))
-
 (fn setup-inventory [dungeon items combat update-status-message]
+    (fn item-class [item]
+        (. item 1))
+    (fn item-durability [item]
+        (. item 2))
+    (fn full-item-description [item]
+        (if item
+            (let [[item-class durability] item
+                  title (. item-class :title)
+                  dice (. item-class :dice)
+                  max-dur (. item-class :durability)]
+              (if (= durability 1)
+                  (lume.format "{title} {dice}" {:title title :dice dice})
+                  (lume.format "{title} {dice} ({dur}/{max-dur})"
+                               {:title title
+                                :dice dice
+                                :dur durability
+                                :max-dur max-dur})))
+            "-"))
+    (fn set-item-durability [item durability]
+        (tset item 2 durability))
+    (fn item-durability-color [item]
+        (if item
+            (let [[item-class durability] item
+                  max-durability (. item-class :durability)
+                  ratio (/ durability max-durability)]
+              [(lume.lerp 0.26 0.43 ratio)
+               (lume.lerp 0.16 0.76 ratio)
+               (lume.lerp 0.18 0.80 ratio)
+               1])
+            [1 1 1 1]))
     (var armor nil)
     (var weapon nil)
     (var item nil)
@@ -157,35 +153,42 @@
                (when (<= (item-durability weapon) 0)
                  (update-status-message "Your weapon breaks.")
                  (set weapon nil))))))
-    {:describe (fn []
-                   [[1 1 1 1]
-                    "ARM: "
-                    (item-durability-color armor)
-                    (.. (full-item-description armor) " ")
-                    [1 1 1 1]
-                    "WEAP: "
-                    (item-durability-color weapon)
-                    (..  (full-item-description weapon) " ")
-                    [1 1 1 1]
-                    "IT: "
-                    (item-durability-color item)
-                    (..  (full-item-description item) " ")])
+    (fn describe []
+        [[1 1 1 1]
+         "ARM: "
+         (item-durability-color armor)
+         (.. (full-item-description armor) " ")
+         [1 1 1 1]
+         "WEAP: "
+         (item-durability-color weapon)
+         (..  (full-item-description weapon) " ")
+         [1 1 1 1]
+         "IT: "
+         (item-durability-color item)
+         (..  (full-item-description item) " ")])
+    (fn defense []
+        (if (and item (= (item-class item) :shield))
+            (. (item-class item) :dice)
+            armor
+            (. (item-class armor) :dice)
+            base-defense))
+    (fn attack []
+        (if weapon
+            (. (item-class weapon) :dice)
+            base-attack))
+    (fn weapon-usable? []
+        (if (ranged-weapon?)
+            (and item (= (. (item-class item) :class) :arrow))
+            true))
+    {:describe describe
      :take take
      :throw throw
      :equip equip
      :unequip unequip
-     :defense (fn []
-                  (if (and item (= (item-class item) :shield))
-                      (. (item-class item) :dice)
-                      armor
-                      (. (item-class armor) :dice)
-                      base-defense))
-     :attack (fn [] (if weapon (. (item-class weapon) :dice) base-attack))
+     :defense defense
+     :attack attack
      :wear-armor wear-armor
      :wear-weapon wear-weapon
      :ranged-weapon? ranged-weapon?
-     :weapon-usable? (fn []
-                         (if (ranged-weapon?)
-                             (and item (= (. (item-class item) :class) :arrow))
-                             true))
+     :weapon-usable? weapon-usable?
      })

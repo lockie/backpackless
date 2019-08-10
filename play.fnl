@@ -1,6 +1,8 @@
 (local shadows (require "shadows"))
 (local utils (require "utils"))
 (local light-world (require "shadows.LightWorld"))
+
+
 (local current-light-world (: light-world :new))
 
 (var dungeon {})
@@ -14,7 +16,7 @@
 (fn update-status-message [...]
     (messaging.update-status-message ...))
 
-{:update (fn update [dt set-mode]
+(fn update [dt set-mode]
              (fn update-world [keep-messages]
                  (when (not keep-messages)
                    (messaging.init-status-message))
@@ -66,15 +68,21 @@
              (player.update dt)
              (mobs.update dt)
              (combat.update dt set-mode)
-             (: current-light-world :Update))
- :draw (fn draw []
+    (: current-light-world :Update))
+
+(fn draw []
            (dungeon.draw)
            (items.draw)
            (mobs.draw)
            (player.draw)
            (: current-light-world :Draw)
-           (messaging.draw))
- :keypressed (fn keypressed [key set-mode]
+    (messaging.draw))
+
+(fn keypressed [key set-mode]
                  (if (or (= key "/") (= key "?"))
                      (set-mode :help)
-                     (player.keypressed key)))}
+                     (player.keypressed key)))
+
+{:update update
+ :draw draw
+ :keypressed keypressed}

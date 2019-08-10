@@ -2,6 +2,7 @@
 (local light (require "shadows.Light"))
 (local utils (require "utils"))
 
+
 (local tile-size 16)
 (local animation-duration 1)
 (local footstep-sounds [])
@@ -115,59 +116,62 @@
             (if (not item)
                 (update-status-message "You got nothing to unequip.")
                 (update-status-message (.. "You unequip the " (item-title item) ".")))))
-      {:update (fn update [dt]
-                   (set current-time (+ current-time dt))
-                   (when (>= current-time animation-duration)
-                     (set current-time (- current-time animation-duration))))
-       :draw (fn draw []
-                 (let [dir (. directions current-direction)
-                       sprite-num 1]
-                       ;; (+ 1
-                       ;;    (math.floor
-                       ;;     (/ (* (# dir) current-time) animation-duration)))]
-                   (love.graphics.draw sprite-sheet (. dir sprite-num)
-                                       (* current-pos-x tile-size)
-                                       (* current-pos-y tile-size))))
-       :keypressed (fn keypressed [key]
-                       (if (or (= key "up") (= key "w") (= key "k"))
-                           (move 1)
-                           (or (= key "right") (= key "d") (= key "l"))
-                           (move 2)
-                           (or (= key "down") (= key "s") (= key "j"))
-                           (move 3)
-                           (or (= key "left") (= key "a") (= key "h"))
-                           (move 4)
-                           (= key "o")
-                           (toggle-door true)
-                           (= key "c")
-                           (toggle-door false)
-                           (= key "g")
-                           (take-item)
-                           (or (= key "backspace") (= key "t"))
-                           (throw-item)
-                           (= key "e")
-                           (equip-item)
-                           (= key "u")
-                           (unequip-item)
-                           (= key ".")
-                           (update-world)
-                           (= key "f")
-                           (attack)
-                           ))
-       :pos (fn pos [] [current-pos-x current-pos-y])
-       :describe (fn describe [key]
-                     (let [hp (combat.player-hp)
-                           max-hp (combat.player-max-hp)
-                           hp-ratio (/ hp max-hp)]
-                       (lume.concat
-                        [[0.26 0.16 0.18 1]
-                         (..
-                          "facing "
-                          (utils.string-pad (utils.direction-description current-direction) 5)
-                          " ")]
-                        [[1 1 1 1]
-                         "HP: "]
-                        [[(- 1 hp-ratio) hp-ratio 0 1]
-                         (.. (tostring hp) " ")]
-                        (inventory.describe))))
+      (fn update [dt]
+          (set current-time (+ current-time dt))
+          (when (>= current-time animation-duration)
+            (set current-time (- current-time animation-duration))))
+      (fn draw []
+          (let [dir (. directions current-direction)
+                sprite-num 1]
+            (love.graphics.draw sprite-sheet (. dir sprite-num)
+                                (* current-pos-x tile-size)
+                                (* current-pos-y tile-size))))
+      (fn keypressed [key]
+          (if (or (= key "up") (= key "w") (= key "k"))
+              (move 1)
+              (or (= key "right") (= key "d") (= key "l"))
+              (move 2)
+              (or (= key "down") (= key "s") (= key "j"))
+              (move 3)
+              (or (= key "left") (= key "a") (= key "h"))
+              (move 4)
+              (= key "o")
+              (toggle-door true)
+              (= key "c")
+              (toggle-door false)
+              (= key "g")
+              (take-item)
+              (or (= key "backspace") (= key "t"))
+              (throw-item)
+              (= key "e")
+              (equip-item)
+              (= key "u")
+              (unequip-item)
+              (= key ".")
+              (update-world)
+              (= key "f")
+              (attack)
+              ))
+      (fn pos []
+          [current-pos-x current-pos-y])
+      (fn describe [key]
+          (let [hp (combat.player-hp)
+                max-hp (combat.player-max-hp)
+                hp-ratio (/ hp max-hp)]
+            (lume.concat
+             [[0.26 0.16 0.18 1]
+              (..
+               "facing "
+               (utils.string-pad (utils.direction-description current-direction) 5)
+               " ")]
+             [[1 1 1 1]
+              "HP: "]
+             [[(- 1 hp-ratio) hp-ratio 0 1]
+              (.. (tostring hp) " ")]
+             (inventory.describe))))
+      {:update update
+       :draw draw
+       :keypressed keypressed
+       :pos pos
+       :describe describe
        }))

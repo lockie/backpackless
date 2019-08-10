@@ -1,5 +1,6 @@
 (local lume (require "lib.lume"))
 
+
 (local tile-size 16)
 (local tile-set (love.graphics.newImage "assets/images/items.png"))
 (local tile-set-width (: tile-set :getWidth))
@@ -119,7 +120,9 @@
                :potion  0.50
                :scroll 0.05})))
           (build-sprite-batch))
-      {:draw (fn [] (love.graphics.draw sprite-batch))
+      (fn draw []
+          (love.graphics.draw sprite-batch))
+      {:draw draw
        :describe describe
        :item-at item-at
        :set-item-at set-item-at

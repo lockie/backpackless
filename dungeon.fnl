@@ -1,6 +1,7 @@
 (local lume (require "lib.lume"))
 (local utils (require "utils"))
 
+
 (local tile-size 16)
 (local message-area-height 36)
 (local door-open-sound (love.audio.newSource "assets/sounds/door-open.ogg" "static"))
@@ -118,19 +119,22 @@
                          (utils.direction-description dir)
                          ".")))))
           result)
-      {:draw (fn draw [] (love.graphics.draw sprite-batch))
+      (fn draw []
+          (love.graphics.draw sprite-batch))
+      (fn initial-pos []
+          (let [pos-x (math.random width)
+                pos-y (math.random height)]
+            (if (traversable? pos-x pos-y)
+                [pos-x pos-y]
+                (initial-pos))))
+      {:draw draw
        :width (fn [] width)
        :height (fn [] height)
        :door? door?
        :toggle-door toggle-door
        :traversable? traversable?
-       :initial-pos (fn initial-pos []
-                        (let [pos-x (math.random width)
-                              pos-y (math.random height)]
-                          (if (traversable? pos-x pos-y)
-                              [pos-x pos-y]
-                              (initial-pos))))
+       :initial-pos initial-pos
        :dead-ends dead-ends
        :rooms rooms
        :describe describe
-             }))
+       }))

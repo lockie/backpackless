@@ -1,7 +1,7 @@
 (local dice (require "lib.dice"))
 
-(local starting-player-hp 64)
 
+(local starting-player-hp 64)
 
 (fn setup-combat [inventory player mobs update-status-message]
     (var player-hp starting-player-hp)

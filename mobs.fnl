@@ -1,5 +1,6 @@
 (local utils (require "utils"))
 
+
 (local tile-size 16)
 (local tile-set (love.graphics.newImage "assets/images/mobs.png"))
 (local tile-set-width (: tile-set :getWidth))
@@ -177,7 +178,9 @@
           (update-state set-mode)
           (simulate)
           (build-sprite-batch))
-      {:draw (fn [] (love.graphics.draw sprite-batch))
+      (fn draw []
+          (love.graphics.draw sprite-batch))
+      {:draw draw
        :update update
        :update-world update-world
        :describe describe
