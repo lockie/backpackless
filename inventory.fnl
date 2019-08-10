@@ -58,19 +58,33 @@
               (do-take))))
     (fn throw [x y]
         (fn random-point-near []
-            (let [dx (math.random -1 1)
-                  dy (math.random -1 1)
-                  new-x (+ x dx)
-                  new-y (+ y dy)]
-              (if (or (and (= dx 0) (= dy 0))
-                      (or (not (dungeon.traversable? new-x new-y)))
-                      (items.item-at new-x new-y))
-                  (random-point-near)
-                  [new-x new-y])))
+            (local points
+                   (lume.shuffle
+                    [[-1 -1]
+                     [-1  0]
+                     [-1  1]
+                     [0  -1]
+                     [0   1]
+                     [1  -1]
+                     [1   0]
+                     [1   1]]))
+            (var new-item-x nil)
+            (var new-item-y nil)
+            (each [i point (ipairs points)]
+                  (when (not new-item-x)
+                    (let [[dx dy] point
+                          new-x (+ x dx)
+                          new-y (+ y dy)]
+                      (when (and (dungeon.traversable? new-x new-y)
+                                 (not (items.item-at new-x new-y)))
+                        (set new-item-x new-x)
+                        (set new-item-y new-y)))))
+            [new-item-x new-item-y])
         (if item
             (let [[new-x new-y] (random-point-near)
                   item-instance item]
-              (items.set-item-at new-x new-y item true)
+              (when new-x
+                (items.set-item-at new-x new-y item true))
               (set item nil)
               item-instance)
             false))
