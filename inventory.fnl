@@ -155,15 +155,15 @@
     (fn describe []
         (let [it (if (dual-wielding?) weapon item)]
           [[1 1 1 1]
-           "ARM: "
+           "BODY "
            (item-durability-color armor)
            (.. (full-item-description armor) " ")
            [1 1 1 1]
-           "WEAP: "
+           "WEAP "
            (item-durability-color weapon)
            (..  (full-item-description weapon) " ")
            [1 1 1 1]
-           "IT: "
+           "ITEM "
            (item-durability-color it)
            (..  (full-item-description it) " ")]))
     (fn defense []

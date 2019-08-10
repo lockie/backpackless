@@ -193,7 +193,7 @@
                (utils.string-pad (utils.direction-description current-direction) 5)
                " ")]
              [[1 1 1 1]
-              "HP: "]
+              "HP "]
              [[(- 1 hp-ratio) hp-ratio 0 1]
               (.. (tostring hp) " ")]
              (inventory.describe))))
