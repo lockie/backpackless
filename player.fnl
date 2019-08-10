@@ -1,13 +1,11 @@
 (local lume (require "lib.lume"))
 (local light (require "shadows.Light"))
 (local utils (require "utils"))
+(local globals (require "globals"))
 
-
-(local tile-size 16)
-(local animation-duration 1)
-(local footstep-sounds [])
 
 (fn create-player [light-world dungeon items inventory mobs combat update-status-message update-world]
+    (local footstep-sounds [])
     (for [i 1 8]
          (tset
           footstep-sounds i
@@ -17,25 +15,27 @@
         (let [image-width (: image :getWidth)
               image-height (: image :getHeight)
               result []]
-          (for [x 0 (- image-width tile-size) tile-size]
+          (for [x 0 (- image-width globals.tile-size) globals.tile-size]
                (table.insert result
                              (love.graphics.newQuad
-                              x y-offset tile-size tile-size image-width image-height)))
+                              x y-offset
+                              globals.tile-size globals.tile-size
+                              image-width image-height)))
           result))
     (let [sprite-sheet (love.graphics.newImage "assets/images/warrior.png")
           south-dir (load-sprites sprite-sheet 0)
-          west-dir (load-sprites sprite-sheet tile-size)
-          east-dir (load-sprites sprite-sheet (* tile-size 2))
-          north-dir (load-sprites sprite-sheet (* tile-size 3))
+          west-dir (load-sprites sprite-sheet globals.tile-size)
+          east-dir (load-sprites sprite-sheet (* globals.tile-size 2))
+          north-dir (load-sprites sprite-sheet (* globals.tile-size 3))
           directions [north-dir east-dir south-dir west-dir]
           [intial-pos-x initial-pos-y] (dungeon.initial-pos)
-          player-light (: light :new light-world (* 6 tile-size))]
+          player-light (: light :new light-world (* 6 globals.tile-size globals.scale-factor))]
       (var current-pos-x intial-pos-x)
       (var current-pos-y initial-pos-y)
       (fn sync-light []
           (: player-light :SetPosition
-             (* current-pos-x tile-size)
-             (* current-pos-y tile-size)))
+             (* current-pos-x globals.tile-size globals.scale-factor)
+             (* current-pos-y globals.tile-size globals.scale-factor)))
       (sync-light)
       (var current-time 0)
       (var current-direction 3)
@@ -118,14 +118,15 @@
                 (update-status-message (.. "You unequip the " (item-title item) ".")))))
       (fn update [dt]
           (set current-time (+ current-time dt))
-          (when (>= current-time animation-duration)
-            (set current-time (- current-time animation-duration))))
+          (when (>= current-time globals.animation-duration)
+            (set current-time (- current-time globals.animation-duration))))
       (fn draw []
           (let [dir (. directions current-direction)
                 sprite-num 1]
             (love.graphics.draw sprite-sheet (. dir sprite-num)
-                                (* current-pos-x tile-size)
-                                (* current-pos-y tile-size))))
+                                (* current-pos-x globals.tile-size globals.scale-factor)
+                                (* current-pos-y globals.tile-size globals.scale-factor)
+                                0 globals.scale-factor globals.scale-factor)))
       (fn keypressed [key]
           (if (or (= key "up") (= key "w") (= key "k"))
               (move 1)

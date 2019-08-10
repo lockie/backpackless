@@ -14,7 +14,7 @@
 
 (fn love.load []
     (love.window.setTitle "Backpackless")
-    (: canvas :setFilter "nearest" "nearest")
+    (love.graphics.setDefaultFilter "nearest" "nearest")
     (repl.start))
 
 (fn love.draw []

@@ -1,11 +1,11 @@
 (local lume (require "lib.lume"))
+(local globals (require "globals"))
 
 
-(local font (love.graphics.newFont "assets/november.ttf" 18))
 (local help (lume.split (love.filesystem.read "assets/text/credits.txt") "\n"))
 
 (fn draw []
-    (love.graphics.setFont font)
+    (love.graphics.setFont globals.font)
     (for [i 1 (# help)]
          (love.graphics.print (. help i) 0 (* 18 (- i 1)))))
 

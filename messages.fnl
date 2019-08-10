@@ -1,16 +1,16 @@
-(local status-font-size 18)
-(local status-font (love.graphics.newFont "assets/november.ttf" status-font-size))
+(local globals (require "globals"))
+
 
 (fn setup-messages [dungeon player items mobs]
     (var status-message "")
     (fn draw []
-        (love.graphics.setFont status-font)
+        (love.graphics.setFont globals.font)
         (love.graphics.print
          status-message
-         0 (- (love.graphics.getHeight) (* 2 status-font-size)))
+         0 (- (love.graphics.getHeight) (* 2 globals.font-size)))
         (love.graphics.print
          (player.describe)
-         0 (- (love.graphics.getHeight) status-font-size)))
+         0 (- (love.graphics.getHeight) globals.font-size)))
     (fn init-status-message []
         (set status-message
              (let [[x y] (player.pos)

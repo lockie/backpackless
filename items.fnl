@@ -1,15 +1,15 @@
 (local lume (require "lib.lume"))
+(local globals (require "globals"))
 
 
-(local tile-size 16)
 (local tile-set (love.graphics.newImage "assets/images/items.png"))
 (local tile-set-width (: tile-set :getWidth))
 (local tile-set-height (: tile-set :getHeight))
 
 (fn setup-item [sprite-index title dice durability class-probability class]
     {:quad (love.graphics.newQuad
-            (* sprite-index tile-size) 0
-            tile-size tile-size
+            (* sprite-index globals.tile-size) 0
+            globals.tile-size globals.tile-size
             tile-set-width tile-set-height)
      :title title
      :dice dice
@@ -66,14 +66,14 @@
       (fn build-sprite-batch []
           (: sprite-batch :clear)
           (for [x 0 (dungeon.width)]
-               (let [col-pos (* x tile-size)
+               (let [col-pos (* x globals.tile-size)
                      col (. items x)]
                  (when col
                    (for [y 0 (dungeon.height)]
                         (let [item (. col y)]
                           (when item
                             (: sprite-batch :add
-                               (. (. item 1) :quad) col-pos (* y tile-size)))))))))
+                               (. (. item 1) :quad) col-pos (* y globals.tile-size)))))))))
       (fn set-item-at [x y item rebuild]
           (when (not (. items x))
             (tset items x []))
@@ -120,8 +120,10 @@
                :potion  0.50
                :scroll 0.05})))
           (build-sprite-batch))
+      (local transform
+             (love.math.newTransform 0 0 0 globals.scale-factor globals.scale-factor))
       (fn draw []
-          (love.graphics.draw sprite-batch))
+          (love.graphics.draw sprite-batch transform))
       {:draw draw
        :describe describe
        :item-at item-at

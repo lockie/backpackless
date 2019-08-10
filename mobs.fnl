@@ -1,22 +1,21 @@
 (local utils (require "utils"))
+(local globals (require "globals"))
 
 
-(local tile-size 16)
 (local tile-set (love.graphics.newImage "assets/images/mobs.png"))
 (local tile-set-width (: tile-set :getWidth))
 (local tile-set-height (: tile-set :getHeight))
 (local animations-count 2)
-(local animation-duration 2)
 
 (fn setup-mob [sprite-index title max-hp attack defense]
     {:quads
      [(love.graphics.newQuad
-       (* sprite-index tile-size) 0
-       tile-size tile-size
+       (* sprite-index globals.tile-size) 0
+       globals.tile-size globals.tile-size
        tile-set-width tile-set-height)
       (love.graphics.newQuad
-       (* sprite-index tile-size) tile-size
-       tile-size tile-size
+       (* sprite-index globals.tile-size) globals.tile-size
+       globals.tile-size globals.tile-size
        tile-set-width tile-set-height)]
      :title title
      :max-hp max-hp
@@ -49,7 +48,7 @@
       (fn build-sprite-batch []
           (: sprite-batch :clear)
           (for [x 0 (dungeon.width)]
-               (let [col-pos (* x tile-size)
+               (let [col-pos (* x globals.tile-size)
                      col (. mobs x)]
                  (when col
                    (for [y 0 (dungeon.height)]
@@ -58,7 +57,7 @@
                             (let [mob-class (. mob 1)]
                               (: sprite-batch :add
                                  (. mob-class.quads current-stance)
-                                 col-pos (* y tile-size))))))))))
+                                 col-pos (* y globals.tile-size))))))))))
       (fn mob-at [x y]
           (let [col (. mobs x)]
             (if col (. col y) nil)))
@@ -166,10 +165,10 @@
                                   (set mob-count (+ mob-count 1)))))))))))
       (fn update [dt]
           (set current-time (+ current-time dt))
-          (when (>= current-time animation-duration)
-            (set current-time (- current-time animation-duration)))
+          (when (>= current-time globals.animation-duration)
+            (set current-time (- current-time globals.animation-duration)))
           (let [new-stance
-                (+ 1 (math.floor (* (/ current-time animation-duration)
+                (+ 1 (math.floor (* (/ current-time globals.animation-duration)
                                     animations-count)))]
             (when (not (= new-stance current-stance))
               (set current-stance new-stance)
@@ -178,8 +177,10 @@
           (update-state set-mode)
           (simulate)
           (build-sprite-batch))
+      (local transform
+             (love.math.newTransform 0 0 0 globals.scale-factor globals.scale-factor))
       (fn draw []
-          (love.graphics.draw sprite-batch))
+          (love.graphics.draw sprite-batch transform))
       {:draw draw
        :update update
        :update-world update-world
