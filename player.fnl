@@ -179,7 +179,7 @@
               (update-world)
               (= key "f")
               (attack)
-              ))
+              (update-status-message "Unknown key. Press ? for help.")))
       (fn pos []
           [current-pos-x current-pos-y])
       (fn describe [key]
