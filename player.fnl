@@ -29,14 +29,11 @@
           north-dir (load-sprites sprite-sheet (* globals.tile-size 3))
           directions [north-dir east-dir south-dir west-dir]
           [intial-pos-x initial-pos-y] (dungeon.initial-pos)
+          [half-x half-y] (utils.half-screen)
           player-light (: light :new light-world (* 6 globals.tile-size globals.scale-factor))]
       (var current-pos-x intial-pos-x)
       (var current-pos-y initial-pos-y)
-      (fn sync-light []
-          (: player-light :SetPosition
-             (* current-pos-x globals.tile-size globals.scale-factor)
-             (* current-pos-y globals.tile-size globals.scale-factor)))
-      (sync-light)
+      (: player-light :SetPosition half-x half-y)
       (var current-time 0)
       (var current-direction 3)
       (fn attack [x y]
@@ -79,7 +76,6 @@
                   (: (. footstep-sounds (math.random 1 8)) :play)
                   (set current-pos-x new-pos-x)
                   (set current-pos-y new-pos-y)
-                  (sync-light)
                   (update-world))
                 (update-status-message "You cannot go there."))))
       (fn toggle-door [open]
@@ -124,9 +120,8 @@
           (let [dir (. directions current-direction)
                 sprite-num 1]
             (love.graphics.draw sprite-sheet (. dir sprite-num)
-                                (* current-pos-x globals.tile-size globals.scale-factor)
-                                (* current-pos-y globals.tile-size globals.scale-factor)
-                                0 globals.scale-factor globals.scale-factor)))
+                                half-x half-y 0
+                                globals.scale-factor globals.scale-factor)))
       (fn keypressed [key]
           (if (or (= key "up") (= key "w") (= key "k"))
               (move 1)

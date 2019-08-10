@@ -1,4 +1,5 @@
-(local direction-descriptions ["north" "east" "south" "west"])
+(local globals (require "globals"))
+
 
 (fn set-table [dst src]
     (each [k v (pairs src)]
@@ -35,7 +36,22 @@
     [new-pos-x new-pos-y])
 
 (fn direction-description [direction]
-     (. direction-descriptions direction))
+    (local direction-descriptions ["north" "east" "south" "west"])
+    (. direction-descriptions direction))
+
+(fn half-screen []
+    [(math.floor (/ (love.graphics.getWidth) 2))
+     (math.floor (/ (- (love.graphics.getHeight)
+                       (* globals.font-size 2))
+                    2))])
+
+(fn player-transform [player]
+    (let [[player-x player-y] (player.pos)
+          [half-x half-y] (half-screen)]
+      (love.math.newTransform
+       (- half-x (* player-x globals.tile-size globals.scale-factor))
+       (- half-y (* player-y globals.tile-size globals.scale-factor))
+       0 globals.scale-factor globals.scale-factor)))
 
 {:set-table set-table
  :empty? empty?
@@ -43,4 +59,6 @@
  :string-pad string-pad
  :advance advance
  :direction-description direction-description
+ :half-screen half-screen
+ :player-transform player-transform
 }

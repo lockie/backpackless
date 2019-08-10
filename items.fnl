@@ -1,4 +1,5 @@
 (local lume (require "lib.lume"))
+(local utils (require "utils"))
 (local globals (require "globals"))
 
 
@@ -43,7 +44,7 @@
                   long-sword halberd hammer short-sword axe
                   small-potion potion large-potion scroll small-shield large-shield dagger])
 
-(fn setup-items [dungeon]
+(fn setup-items [dungeon player]
     (let [sprite-batch (love.graphics.newSpriteBatch tile-set)
           items []  ;; [int][int] -> item instance + durability(count)
           ]
@@ -120,10 +121,8 @@
                :potion  0.50
                :scroll 0.05})))
           (build-sprite-batch))
-      (local transform
-             (love.math.newTransform 0 0 0 globals.scale-factor globals.scale-factor))
       (fn draw []
-          (love.graphics.draw sprite-batch transform))
+          (love.graphics.draw sprite-batch (utils.player-transform player)))
       {:draw draw
        :describe describe
        :item-at item-at

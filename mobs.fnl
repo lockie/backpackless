@@ -29,7 +29,7 @@
 
 (local mob-classes [demon spider slime zombie])
 
-(fn setup-mobs [dungeon player-position combat items update-status-message]
+(fn setup-mobs [dungeon player combat items update-status-message]
     (let [sprite-batch (love.graphics.newSpriteBatch tile-set)
           mobs []  ;; [int][int] -> mob class + HP
           ]
@@ -67,7 +67,7 @@
           (tset (. mobs x) y mob)
           (when rebuild
             (build-sprite-batch)))
-      (let [[player-x player-y] (player-position)]
+      (let [[player-x player-y] (player.pos)]
         (lume.each
          (dungeon.dead-ends)
          (fn [dead-end]
@@ -110,7 +110,7 @@
           (when rebuild
             (build-sprite-batch)))
       (fn simulate []
-          (let [[player-x player-y] (player-position)]
+          (let [[player-x player-y] (player.pos)]
             (fn move-mob [x y new-x new-y]
                 (if (and (dungeon.traversable? new-x new-y)
                          (not (mob-at new-x new-y))
@@ -177,10 +177,8 @@
           (update-state set-mode)
           (simulate)
           (build-sprite-batch))
-      (local transform
-             (love.math.newTransform 0 0 0 globals.scale-factor globals.scale-factor))
       (fn draw []
-          (love.graphics.draw sprite-batch transform))
+          (love.graphics.draw sprite-batch (utils.player-transform player)))
       {:draw draw
        :update update
        :update-world update-world

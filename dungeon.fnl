@@ -3,17 +3,12 @@
 (local globals (require "globals"))
 
 
-(local message-area-height 36)
-(local door-open-sound (love.audio.newSource "assets/sounds/door-open.ogg" "static"))
-(local door-close-sound (love.audio.newSource "assets/sounds/door-close.ogg" "static"))
-
-(fn generate-dungeon []
+(fn generate-dungeon [player]
+    (local door-open-sound (love.audio.newSource "assets/sounds/door-open.ogg" "static"))
+    (local door-close-sound (love.audio.newSource "assets/sounds/door-close.ogg" "static"))
     (let [astray (require "lib.astray.astray")
           generator (: astray :new
-                       (math.floor (/ (love.graphics.getWidth) globals.tile-size 2))
-                       (math.floor (/
-                                    (- (love.graphics.getHeight) message-area-height)
-                                    globals.tile-size 2))
+                       30 30  ;; width x height
                        10  ;; changeDirectionModifier
                        30  ;; sparsenessModifier
                        )
@@ -119,10 +114,8 @@
                          (utils.direction-description dir)
                          ".")))))
           result)
-      (local transform
-             (love.math.newTransform 0 0 0 globals.scale-factor globals.scale-factor))
       (fn draw []
-          (love.graphics.draw sprite-batch transform))
+          (love.graphics.draw sprite-batch (utils.player-transform player)))
       (fn initial-pos []
           (let [pos-x (math.random width)
                 pos-y (math.random height)]
