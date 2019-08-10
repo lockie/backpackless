@@ -123,7 +123,27 @@
                     (set item nil)
                     old-item)
                   (= class :scroll)
-                  false  ;; TODO : use scroll
+                  (let [old-item item]
+                    (when armor
+                      (let [armor-durability (item-durability armor)
+                            max-armor-durability (. (item-class armor) :durability)]
+                        (set-item-durability
+                         armor
+                         (math.floor
+                          (math.max
+                           (lume.random armor-durability max-armor-durability)
+                           (lume.random armor-durability max-armor-durability))))))
+                    (when weapon
+                      (let [weapon-durability (item-durability weapon)
+                            max-weapon-durability (. (item-class weapon) :durability)]
+                        (set-item-durability
+                         weapon
+                         (math.floor
+                          (math.max
+                           (lume.random weapon-durability max-weapon-durability)
+                           (lume.random weapon-durability max-weapon-durability))))))
+                    (set item nil)
+                    old-item)
                   (= class :shield)
                   false))))
     (fn unequip []
