@@ -90,6 +90,8 @@
                     (.. "You " (if new-door-status "open" "close") " the door.") true))))))
       (fn item-title [item]
           (. (. item 1) :title))
+      (fn item-class [item]
+          (. (. item 1) :class))
       (fn take-item []
           (let [item (items.item-at current-pos-x current-pos-y)]
             (if (not item)
@@ -106,7 +108,10 @@
           (let [item (inventory.equip)]
             (if (not item)
                 (update-status-message "You cannot equip that.")
-                (update-status-message (.. "You equip the " (item-title item) ".")))))
+                (let [verb
+                      (if (or (= (item-class item) :potion) (= (item-class item) :scroll))
+                          "use" "equip")]
+                  (update-status-message (.. "You " verb " the " (item-title item) "."))))))
       (fn unequip-item []
           (let [item (inventory.unequip)]
             (if (not item)
