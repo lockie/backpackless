@@ -24,7 +24,7 @@
 (local enhanced-arrow (setup-item 3  "bolts"         ""       10 0.20 :arrow))
 (local armor          (setup-item 4  "plate"         "1d4"    30 0.80 :armor))
 (local enhanced-armor (setup-item 5  "cuirass"       "3d4"    50 0.20 :armor))
-(local candle         (setup-item 6  "candle"        ""       20 0.80 :light-source))
+(local candle         (setup-item 6  "candle"        ""       10 0.80 :light-source))
 (local lamp           (setup-item 7  "lamp"          ""       50 0.20 :light-source))
 (local long-sword     (setup-item 8  "long sword"    "3d4^+3" 50 0.40 :double-handed-weapon))
 (local halberd        (setup-item 9  "halberd"       "1d8"    50 0.25 :double-handed-weapon))

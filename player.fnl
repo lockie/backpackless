@@ -31,14 +31,25 @@
           directions [north-dir east-dir south-dir west-dir]
           [intial-pos-x initial-pos-y] (dungeon.initial-pos)
           [half-x half-y] (utils.half-screen)
-          player-light (: light :new light-world (* 4 globals.tile-size globals.scale-factor))
-          player-star (: star :new light-world (* 5 globals.tile-size globals.scale-factor))
-          ]
+          player-star (: star :new light-world 1)
+          player-light (: light :new light-world 1)]
       (var current-pos-x intial-pos-x)
       (var current-pos-y initial-pos-y)
+      (fn set-extra-light-radius [r]
+          (print
+           (* (+ r 4) globals.tile-size globals.scale-factor)
+           (* (+ r 5) globals.tile-size globals.scale-factor))
+          (: player-light :SetRadius
+             (* (+ (/ r 4) 4) globals.tile-size globals.scale-factor))
+          (: player-star :SetRadius
+             (* (+ r 5) globals.tile-size globals.scale-factor))
+          (: light-world :ForceUpdate))
+      (set-extra-light-radius 0)
       (fn sync-light []
-          (let [pos-x (* current-pos-x globals.tile-size globals.scale-factor)
-                pos-y (* current-pos-y globals.tile-size globals.scale-factor)]
+          (let [pos-x (+ (* current-pos-x globals.tile-size globals.scale-factor)
+                         (* 0.5 globals.tile-size globals.scale-factor))
+                pos-y (+ (* current-pos-y globals.tile-size globals.scale-factor)
+                         (* 0.5 globals.tile-size globals.scale-factor))]
             (: player-light :SetPosition pos-x pos-y)
             (: player-star :SetPosition pos-x pos-y)))
       (sync-light)
@@ -107,12 +118,16 @@
                 (update-status-message "There is nothing here.")
                 (if (not (inventory.take current-pos-x current-pos-y))
                     (update-status-message "You are overburdened.")
-                    (update-status-message (.. "You take the " (item-title item) "."))))))
+                    (do
+                     (update-status-message (.. "You take the " (item-title item) "."))
+                     (update-world true))))))
       (fn throw-item []
           (let [item (inventory.throw current-pos-x current-pos-y)]
             (if (not item)
                 (update-status-message "You got nothing to throw.")
-                (update-status-message (.. "You throw the " (item-title item) " away.")))))
+                (do
+                 (update-status-message (.. "You throw the " (item-title item) " away."))
+                 (update-world true)))))
       (fn equip-item []
           (let [item (inventory.equip)]
             (if (not item)
@@ -120,12 +135,15 @@
                 (let [verb
                       (if (or (= (item-class item) :potion) (= (item-class item) :scroll))
                           "use" "equip")]
-                  (update-status-message (.. "You " verb " the " (item-title item) "."))))))
+                  (update-status-message (.. "You " verb " the " (item-title item) "."))
+                  (update-world true)))))
       (fn unequip-item []
           (let [item (inventory.unequip)]
             (if (not item)
                 (update-status-message "You got nothing to unequip.")
-                (update-status-message (.. "You unequip the " (item-title item) ".")))))
+                (do
+                 (update-status-message (.. "You unequip the " (item-title item) "."))
+                 (update-world true)))))
       (fn update [dt]
           (set current-time (+ current-time dt))
           (when (>= current-time globals.animation-duration)
@@ -184,4 +202,5 @@
        :keypressed keypressed
        :pos pos
        :describe describe
+       :set-extra-light-radius set-extra-light-radius
        }))

@@ -4,7 +4,7 @@
 (local base-defense "1d2")
 (local base-attack  "1d2")
 
-(fn setup-inventory [dungeon items combat update-status-message]
+(fn setup-inventory [dungeon player items combat update-status-message]
     (fn item-class [item]
         (. item 1))
     (fn item-durability [item]
@@ -179,6 +179,16 @@
         (if (ranged-weapon?)
             (and item (= (. (item-class item) :class) :arrow))
             true))
+    (fn update-world []
+        (player.set-extra-light-radius 0)
+        (when item
+          (let [it (item-class item)]
+            (if (= it.class :light-source)
+                (do
+                 (set-item-durability item (- (item-durability item) 1))
+                 (if (= (item-durability item) 0)
+                     (set item nil)
+                     (player.set-extra-light-radius 3)))))))
     {:describe describe
      :take take
      :throw throw
@@ -190,4 +200,5 @@
      :wear-weapon wear-weapon
      :ranged-weapon? ranged-weapon?
      :weapon-usable? weapon-usable?
+     :update-world update-world
      })

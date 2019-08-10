@@ -21,6 +21,7 @@
     (fn update-world [keep-messages]
         (when (not keep-messages)
           (messaging.init-status-message))
+        (inventory.update-world)
         (mobs.update-world set-mode))
     (when (utils.empty? dungeon)
       (let [generate-dungeon (require "dungeon")]
@@ -36,7 +37,7 @@
       (let [setup-inventory (require "inventory")]
         (utils.set-table
          inventory
-         (setup-inventory dungeon items combat update-status-message))))
+         (setup-inventory dungeon player items combat update-status-message))))
     (when (utils.empty? player)
       (let [create-player (require "player")]
         (utils.set-table
