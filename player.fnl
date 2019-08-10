@@ -1,5 +1,6 @@
 (local lume (require "lib.lume"))
 (local light (require "shadows.Light"))
+(local star (require "shadows.Star"))
 (local utils (require "utils"))
 (local globals (require "globals"))
 
@@ -30,10 +31,17 @@
           directions [north-dir east-dir south-dir west-dir]
           [intial-pos-x initial-pos-y] (dungeon.initial-pos)
           [half-x half-y] (utils.half-screen)
-          player-light (: light :new light-world (* 6 globals.tile-size globals.scale-factor))]
+          player-light (: light :new light-world (* 4 globals.tile-size globals.scale-factor))
+          player-star (: star :new light-world (* 5 globals.tile-size globals.scale-factor))
+          ]
       (var current-pos-x intial-pos-x)
       (var current-pos-y initial-pos-y)
-      (: player-light :SetPosition half-x half-y)
+      (fn sync-light []
+          (let [pos-x (* current-pos-x globals.tile-size globals.scale-factor)
+                pos-y (* current-pos-y globals.tile-size globals.scale-factor)]
+            (: player-light :SetPosition pos-x pos-y)
+            (: player-star :SetPosition pos-x pos-y)))
+      (sync-light)
       (var current-time 0)
       (var current-direction 3)
       (fn attack [x y]
@@ -76,6 +84,7 @@
                   (: (. footstep-sounds (math.random 1 8)) :play)
                   (set current-pos-x new-pos-x)
                   (set current-pos-y new-pos-y)
+                  (sync-light)
                   (update-world))
                 (update-status-message "You cannot go there."))))
       (fn toggle-door [open]

@@ -1,9 +1,10 @@
 (local lume (require "lib.lume"))
+(local light-room (require "shadows.Room.RectangleRoom"))
 (local utils (require "utils"))
 (local globals (require "globals"))
 
 
-(fn generate-dungeon [player]
+(fn generate-dungeon [current-light-world player]
     (local door-open-sound (love.audio.newSource "assets/sounds/door-open.ogg" "static"))
     (local door-close-sound (love.audio.newSource "assets/sounds/door-close.ogg" "static"))
     (let [astray (require "lib.astray.astray")
@@ -98,7 +99,19 @@
            (fn [room]
                (let [bounds room.bounds]
                  [(+ (* bounds.X 2) 1)
-                  (+ (* bounds.Y 2) 1)]))))
+                  (+ (* bounds.Y 2) 1)
+                  (- (* bounds.Width 2) 1)
+                  (- (* bounds.Height 2) 1)]))))
+      (local light-rooms
+             (lume.map
+              (rooms)
+              (fn [room]
+                  (let [[x y w h] room]
+                    (: light-room :new current-light-world
+                       (* x globals.tile-size globals.scale-factor)
+                       (* y globals.tile-size globals.scale-factor)
+                       (* w globals.tile-size globals.scale-factor)
+                       (* h globals.tile-size globals.scale-factor))))))
       (fn describe [x y]
           (var result "")
           (for [dir 1 4]

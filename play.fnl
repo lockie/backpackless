@@ -26,7 +26,7 @@
       (let [generate-dungeon (require "dungeon")]
         (utils.set-table
          dungeon
-         (generate-dungeon player))))
+         (generate-dungeon current-light-world player))))
     (when (utils.empty? items)
       (let [setup-items (require "items")]
         (utils.set-table
@@ -69,6 +69,11 @@
     (player.update dt)
     (mobs.update dt)
     (combat.update dt set-mode)
+    (let [[half-x half-y] (utils.half-screen)
+          [player-x player-y] (player.pos)
+          camera-x (- (* player-x globals.tile-size globals.scale-factor) half-x)
+          camera-y (- (* player-y globals.tile-size globals.scale-factor) half-y)]
+      (: current-light-world :SetPosition camera-x camera-y 1))
     (: current-light-world :Update))
 
 (fn draw []
