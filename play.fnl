@@ -67,6 +67,9 @@
          messaging
          (setup-messages dungeon player items mobs))
         (update-status-message "You enter the dungeon. Press ? for help.")))
+    (when (not (: globals.ambient-music :isPlaying))
+      (: globals.ambient-music :setLooping true)
+      (: globals.ambient-music :play))
     (player.update dt)
     (mobs.update dt)
     (combat.update dt set-mode)

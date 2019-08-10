@@ -36,9 +36,6 @@
       (var current-pos-x intial-pos-x)
       (var current-pos-y initial-pos-y)
       (fn set-extra-light-radius [r]
-          (print
-           (* (+ r 4) globals.tile-size globals.scale-factor)
-           (* (+ r 5) globals.tile-size globals.scale-factor))
           (: player-light :SetRadius
              (* (+ (/ r 4) 4) globals.tile-size globals.scale-factor))
           (: player-star :SetRadius

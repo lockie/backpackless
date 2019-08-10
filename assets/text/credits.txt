@@ -18,14 +18,16 @@
  Timothy Torres                          Brandon Schoepf
  https://github.com/                     https://www.1001fonts.com/november-font.html
  timothymtorres/RL-Dice
-
- * Shadows library
- Matias Hermosilla
+                                         * Winning theme
+ * Shadows library                       Matthew Pablo
+ Matias Hermosilla                       https://opengameart.org/content/riverside-ride
  https://github.com/matiasah/shadows
 
  * Love-release library
  Antonin Decimo
  https://github.com/MisterDA/
  love-release
+
+
 
                                    PRESS ESC TO EXIT

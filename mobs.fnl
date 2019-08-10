@@ -35,6 +35,7 @@
           ]
       (var current-time 0)
       (var current-stance 1)
+      (var mob-count 0)
       (fn generate-mob [class-choices]
           (local class (lume.weightedchoice class-choices))
           (let [class (lume.weightedchoice class-choices)
@@ -47,6 +48,7 @@
             [class hp]))
       (fn build-sprite-batch []
           (: sprite-batch :clear)
+          (set mob-count 0)
           (for [x 0 (dungeon.width)]
                (let [col-pos (* x globals.tile-size)
                      col (. mobs x)]
@@ -54,6 +56,7 @@
                    (for [y 0 (dungeon.height)]
                         (let [mob (. col y)]
                           (when mob
+                            (set mob-count (+ mob-count 1))
                             (let [mob-class (. mob 1)]
                               (: sprite-batch :add
                                  (. mob-class.quads current-stance)
@@ -176,7 +179,15 @@
       (fn update-world [set-mode]
           (update-state set-mode)
           (simulate)
-          (build-sprite-batch))
+          (build-sprite-batch)
+          (when (= 0 mob-count)
+            (update-status-message "You beat the dungeon.")
+            (let [win-music
+                  (love.audio.newSource "assets/sounds/riverside-ride.ogg" "stream")]
+              (: globals.ambient-music :stop)
+              (: win-music :setLooping true)
+              (: win-music :play))
+            (set-mode :credits)))
       (fn draw []
           (love.graphics.draw sprite-batch (utils.player-transform player)))
       {:draw draw

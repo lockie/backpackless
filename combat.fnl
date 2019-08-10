@@ -1,4 +1,5 @@
 (local dice (require "lib.dice"))
+(local globals (require "globals"))
 
 
 (local starting-player-hp 64)
@@ -61,6 +62,10 @@
     (fn update [dt set-mode]
         (when (<= player-hp 0)
           (update-status-message "You die.")
+          (: globals.ambient-music :stop)
+          (:
+           (love.audio.newSource "assets/sounds/sad-trombone.ogg" "stream")
+           :play)
           (set-mode :credits)))
 
     {:player-hp (fn [] player-hp)
