@@ -153,18 +153,19 @@
                  (update-status-message "Your weapon breaks.")
                  (set weapon nil))))))
     (fn describe []
-        [[1 1 1 1]
-         "ARM: "
-         (item-durability-color armor)
-         (.. (full-item-description armor) " ")
-         [1 1 1 1]
-         "WEAP: "
-         (item-durability-color weapon)
-         (..  (full-item-description weapon) " ")
-         [1 1 1 1]
-         "IT: "
-         (item-durability-color item)
-         (..  (full-item-description item) " ")])
+        (let [it (if (dual-wielding?) weapon item)]
+          [[1 1 1 1]
+           "ARM: "
+           (item-durability-color armor)
+           (.. (full-item-description armor) " ")
+           [1 1 1 1]
+           "WEAP: "
+           (item-durability-color weapon)
+           (..  (full-item-description weapon) " ")
+           [1 1 1 1]
+           "IT: "
+           (item-durability-color it)
+           (..  (full-item-description it) " ")]))
     (fn defense []
         (if (and item (= (item-class item) :shield))
             (. (item-class item) :dice)
