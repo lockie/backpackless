@@ -9,7 +9,7 @@
     (local door-close-sound (love.audio.newSource "assets/sounds/door-close.ogg" "static"))
     (let [astray (require "lib.astray.astray")
           generator (: astray :new
-                       30 30  ;; width x height
+                       35 25  ;; width x height
                        10  ;; changeDirectionModifier
                        30  ;; sparsenessModifier
                        )
