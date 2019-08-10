@@ -16,10 +16,9 @@
                   dice (. item-class :dice)
                   max-dur (. item-class :durability)]
               (if (= durability 1)
-                  (lume.format "{title} {dice}" {:title title :dice dice})
-                  (lume.format "{title} {dice} ({dur}/{max-dur})"
+                  title
+                  (lume.format "{title} ({dur}/{max-dur})"
                                {:title title
-                                :dice dice
                                 :dur durability
                                 :max-dur max-dur})))
             "-"))

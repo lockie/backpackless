@@ -20,8 +20,8 @@
 
 (local short-bow      (setup-item 0  "short bow"     "1d6"    1  0.20 :single-handed-weapon))
 (local long-bow       (setup-item 1  "long bow"      "3d6"    1  0.20 :double-handed-weapon))
-(local arrow          (setup-item 2  "arrow pack"    ""       10 0.80 :arrow))
-(local enhanced-arrow (setup-item 3  "bolts pack"    ""       10 0.20 :arrow))
+(local arrow          (setup-item 2  "arrows"        ""       10 0.80 :arrow))
+(local enhanced-arrow (setup-item 3  "bolts"         ""       10 0.20 :arrow))
 (local armor          (setup-item 4  "plate"         "1d4"    30 0.80 :armor))
 (local enhanced-armor (setup-item 5  "cuirass"       "3d4"    50 0.20 :armor))
 (local candle         (setup-item 6  "candle"        ""       20 0.80 :light-source))
