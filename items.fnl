@@ -1,14 +1,16 @@
 (local lume (require "lib.lume"))
+(local utils (require "utils"))
+(local globals (require "globals"))
 
-(local tile-size 16)
+
 (local tile-set (love.graphics.newImage "assets/images/items.png"))
 (local tile-set-width (: tile-set :getWidth))
 (local tile-set-height (: tile-set :getHeight))
 
 (fn setup-item [sprite-index title dice durability class-probability class]
     {:quad (love.graphics.newQuad
-            (* sprite-index tile-size) 0
-            tile-size tile-size
+            (* sprite-index globals.tile-size) 0
+            globals.tile-size globals.tile-size
             tile-set-width tile-set-height)
      :title title
      :dice dice
@@ -18,11 +20,11 @@
 
 (local short-bow      (setup-item 0  "short bow"     "1d6"    1  0.20 :single-handed-weapon))
 (local long-bow       (setup-item 1  "long bow"      "3d6"    1  0.20 :double-handed-weapon))
-(local arrow          (setup-item 2  "arrow pack"    ""       10 0.80 :arrow))
-(local enhanced-arrow (setup-item 3  "bolts pack"    ""       10 0.20 :arrow))
+(local arrow          (setup-item 2  "arrows"        ""       10 0.80 :arrow))
+(local enhanced-arrow (setup-item 3  "bolts"         ""       10 0.20 :arrow))
 (local armor          (setup-item 4  "plate"         "1d4"    30 0.80 :armor))
 (local enhanced-armor (setup-item 5  "cuirass"       "3d4"    50 0.20 :armor))
-(local candle         (setup-item 6  "candle"        ""       20 0.80 :light-source))
+(local candle         (setup-item 6  "candle"        ""       10 0.80 :light-source))
 (local lamp           (setup-item 7  "lamp"          ""       50 0.20 :light-source))
 (local long-sword     (setup-item 8  "long sword"    "3d4^+3" 50 0.40 :double-handed-weapon))
 (local halberd        (setup-item 9  "halberd"       "1d8"    50 0.25 :double-handed-weapon))
@@ -42,7 +44,7 @@
                   long-sword halberd hammer short-sword axe
                   small-potion potion large-potion scroll small-shield large-shield dagger])
 
-(fn setup-items [dungeon]
+(fn setup-items [dungeon player]
     (let [sprite-batch (love.graphics.newSpriteBatch tile-set)
           items []  ;; [int][int] -> item instance + durability(count)
           ]
@@ -65,14 +67,14 @@
       (fn build-sprite-batch []
           (: sprite-batch :clear)
           (for [x 0 (dungeon.width)]
-               (let [col-pos (* x tile-size)
+               (let [col-pos (* x globals.tile-size)
                      col (. items x)]
                  (when col
                    (for [y 0 (dungeon.height)]
                         (let [item (. col y)]
                           (when item
                             (: sprite-batch :add
-                               (. (. item 1) :quad) col-pos (* y tile-size)))))))))
+                               (. (. item 1) :quad) col-pos (* y globals.tile-size)))))))))
       (fn set-item-at [x y item rebuild]
           (when (not (. items x))
             (tset items x []))
@@ -119,7 +121,9 @@
                :potion  0.50
                :scroll 0.05})))
           (build-sprite-batch))
-      {:draw (fn [] (love.graphics.draw sprite-batch))
+      (fn draw []
+          (love.graphics.draw sprite-batch (utils.player-transform player)))
+      {:draw draw
        :describe describe
        :item-at item-at
        :set-item-at set-item-at

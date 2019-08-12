@@ -12,9 +12,6 @@ arrows / wasd / hjkl : movement
                    TARGET
             Kill all the monsters.
 
-               DAMAGE NUMBERS
-2d6^+3 means roll 2 6-sided die with 3 rerolls.
-
                SPECIFICITIES
 You can carry only one item. When dual wielding,
           you cannot carry anything.

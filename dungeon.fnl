@@ -1,18 +1,15 @@
 (local lume (require "lib.lume"))
+(local light-room (require "shadows.Room.RectangleRoom"))
 (local utils (require "utils"))
+(local globals (require "globals"))
 
-(local tile-size 16)
-(local message-area-height 36)
-(local door-open-sound (love.audio.newSource "assets/sounds/door-open.ogg" "static"))
-(local door-close-sound (love.audio.newSource "assets/sounds/door-close.ogg" "static"))
 
-(fn generate-dungeon []
+(fn generate-dungeon [current-light-world player]
+    (local door-open-sound (love.audio.newSource "assets/sounds/door-open.ogg" "static"))
+    (local door-close-sound (love.audio.newSource "assets/sounds/door-close.ogg" "static"))
     (let [astray (require "lib.astray.astray")
           generator (: astray :new
-                       (math.floor (/ (love.graphics.getWidth) tile-size 2))
-                       (math.floor (/
-                                    (- (love.graphics.getHeight) message-area-height)
-                                    tile-size 2))
+                       35 25  ;; width x height
                        10  ;; changeDirectionModifier
                        30  ;; sparsenessModifier
                        )
@@ -24,13 +21,13 @@
           tile-set-height (: tile-set :getHeight)
           sprite-batch (love.graphics.newSpriteBatch tile-set)
           wall-quad (love.graphics.newQuad
-                      0 0 tile-size tile-size tile-set-width tile-set-height)
+                      0 0 globals.tile-size globals.tile-size tile-set-width tile-set-height)
           empty-quad (love.graphics.newQuad
-                       tile-size 0 tile-size tile-size tile-set-width tile-set-height)
+                       globals.tile-size 0 globals.tile-size globals.tile-size tile-set-width tile-set-height)
           closed-door-quad (love.graphics.newQuad
-                             (* 2 tile-size) 0 tile-size tile-size tile-set-width tile-set-height)
+                             (* 2 globals.tile-size) 0 globals.tile-size globals.tile-size tile-set-width tile-set-height)
           open-door-quad (love.graphics.newQuad
-                           (* 3 tile-size) 0 tile-size tile-size tile-set-width tile-set-height)
+                           (* 3 globals.tile-size) 0 globals.tile-size globals.tile-size tile-set-width tile-set-height)
           tiles (: generator :CellToTiles dungeon
                    {:Wall wall-quad :Empty empty-quad
                     :DoorN closed-door-quad :DoorS closed-door-quad
@@ -40,10 +37,10 @@
       (fn build-sprite-batch []
           (: sprite-batch :clear)
           (for [x 0 (# tiles)]
-               (let [col-pos (* x tile-size)
+               (let [col-pos (* x globals.tile-size)
                      col (. tiles x)]
                  (for [y 0 (# col)]
-                      (let [row-pos (* y tile-size)]
+                      (let [row-pos (* y globals.tile-size)]
                         (var cell (. col y))
                         (when (= cell closed-door-quad)
                           (when (. (. doors-state x) y)
@@ -102,7 +99,19 @@
            (fn [room]
                (let [bounds room.bounds]
                  [(+ (* bounds.X 2) 1)
-                  (+ (* bounds.Y 2) 1)]))))
+                  (+ (* bounds.Y 2) 1)
+                  (- (* bounds.Width 2) 1)
+                  (- (* bounds.Height 2) 1)]))))
+      (local light-rooms
+             (lume.map
+              (rooms)
+              (fn [room]
+                  (let [[x y w h] room]
+                    (: light-room :new current-light-world
+                       (* x globals.tile-size globals.scale-factor)
+                       (* y globals.tile-size globals.scale-factor)
+                       (* w globals.tile-size globals.scale-factor)
+                       (* h globals.tile-size globals.scale-factor))))))
       (fn describe [x y]
           (var result "")
           (for [dir 1 4]
@@ -118,19 +127,22 @@
                          (utils.direction-description dir)
                          ".")))))
           result)
-      {:draw (fn draw [] (love.graphics.draw sprite-batch))
+      (fn draw []
+          (love.graphics.draw sprite-batch (utils.player-transform player)))
+      (fn initial-pos []
+          (let [pos-x (math.random width)
+                pos-y (math.random height)]
+            (if (traversable? pos-x pos-y)
+                [pos-x pos-y]
+                (initial-pos))))
+      {:draw draw
        :width (fn [] width)
        :height (fn [] height)
        :door? door?
        :toggle-door toggle-door
        :traversable? traversable?
-       :initial-pos (fn initial-pos []
-                        (let [pos-x (math.random width)
-                              pos-y (math.random height)]
-                          (if (traversable? pos-x pos-y)
-                              [pos-x pos-y]
-                              (initial-pos))))
+       :initial-pos initial-pos
        :dead-ends dead-ends
        :rooms rooms
        :describe describe
-             }))
+       }))

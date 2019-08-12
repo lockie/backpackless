@@ -1,7 +1,8 @@
 (local dice (require "lib.dice"))
+(local globals (require "globals"))
+
 
 (local starting-player-hp 64)
-
 
 (fn setup-combat [inventory player mobs update-status-message]
     (var player-hp starting-player-hp)
@@ -19,11 +20,11 @@
               damage-dealt (do-attack mob-class.attack (inventory.defense))]
           (if (not damage-dealt)
               (update-status-message
-               (.. "The " mob-class.title " attacks but misses you."))
+               (.. "The " mob-class.title " misses you."))
               (do
                (update-status-message
-                (.. "The " mob-class.title " attacks dealing "
-                    damage-dealt " damage to you."))
+                (.. "The " mob-class.title " hits you with "
+                    damage-dealt " damage."))
                (inventory.wear-armor (math.random damage-dealt))
                (set player-hp (- player-hp damage-dealt))))))
 
@@ -41,11 +42,13 @@
               ranged-attack (inventory.ranged-weapon?)
               attack-text (if ranged-attack "shoot" "hit")]
           (if (not damage-dealt)
-              (update-status-message
-               (.. "You " attack-text " " mob-class.title " but miss."))
               (do
                (update-status-message
-                (.. "You " attack-text " " mob-class.title " dealing "
+                (.. "You miss " mob-class.title "."))
+               (inventory.wear-weapon 0))
+              (do
+               (update-status-message
+                (.. "You " attack-text " " mob-class.title " with "
                     damage-dealt " damage."))
                (inventory.wear-weapon (math.random damage-dealt))
                (tset mob 2 (- (. mob 2) damage-dealt))))))
@@ -59,6 +62,10 @@
     (fn update [dt set-mode]
         (when (<= player-hp 0)
           (update-status-message "You die.")
+          (: globals.ambient-music :stop)
+          (:
+           (love.audio.newSource "assets/sounds/sad-trombone.ogg" "stream")
+           :play)
           (set-mode :credits)))
 
     {:player-hp (fn [] player-hp)

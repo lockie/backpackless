@@ -1,21 +1,21 @@
 (local utils (require "utils"))
+(local globals (require "globals"))
 
-(local tile-size 16)
+
 (local tile-set (love.graphics.newImage "assets/images/mobs.png"))
 (local tile-set-width (: tile-set :getWidth))
 (local tile-set-height (: tile-set :getHeight))
 (local animations-count 2)
-(local animation-duration 2)
 
 (fn setup-mob [sprite-index title max-hp attack defense]
     {:quads
      [(love.graphics.newQuad
-       (* sprite-index tile-size) 0
-       tile-size tile-size
+       (* sprite-index globals.tile-size) 0
+       globals.tile-size globals.tile-size
        tile-set-width tile-set-height)
       (love.graphics.newQuad
-       (* sprite-index tile-size) tile-size
-       tile-size tile-size
+       (* sprite-index globals.tile-size) globals.tile-size
+       globals.tile-size globals.tile-size
        tile-set-width tile-set-height)]
      :title title
      :max-hp max-hp
@@ -29,12 +29,13 @@
 
 (local mob-classes [demon spider slime zombie])
 
-(fn setup-mobs [dungeon player-position combat items update-status-message]
+(fn setup-mobs [dungeon player combat items update-status-message]
     (let [sprite-batch (love.graphics.newSpriteBatch tile-set)
           mobs []  ;; [int][int] -> mob class + HP
           ]
       (var current-time 0)
       (var current-stance 1)
+      (var mob-count 0)
       (fn generate-mob [class-choices]
           (local class (lume.weightedchoice class-choices))
           (let [class (lume.weightedchoice class-choices)
@@ -47,17 +48,19 @@
             [class hp]))
       (fn build-sprite-batch []
           (: sprite-batch :clear)
+          (set mob-count 0)
           (for [x 0 (dungeon.width)]
-               (let [col-pos (* x tile-size)
+               (let [col-pos (* x globals.tile-size)
                      col (. mobs x)]
                  (when col
                    (for [y 0 (dungeon.height)]
                         (let [mob (. col y)]
                           (when mob
+                            (set mob-count (+ mob-count 1))
                             (let [mob-class (. mob 1)]
                               (: sprite-batch :add
                                  (. mob-class.quads current-stance)
-                                 col-pos (* y tile-size))))))))))
+                                 col-pos (* y globals.tile-size))))))))))
       (fn mob-at [x y]
           (let [col (. mobs x)]
             (if col (. col y) nil)))
@@ -67,7 +70,7 @@
           (tset (. mobs x) y mob)
           (when rebuild
             (build-sprite-batch)))
-      (let [[player-x player-y] (player-position)]
+      (let [[player-x player-y] (player.pos)]
         (lume.each
          (dungeon.dead-ends)
          (fn [dead-end]
@@ -110,7 +113,7 @@
           (when rebuild
             (build-sprite-batch)))
       (fn simulate []
-          (let [[player-x player-y] (player-position)]
+          (let [[player-x player-y] (player.pos)]
             (fn move-mob [x y new-x new-y]
                 (if (and (dungeon.traversable? new-x new-y)
                          (not (mob-at new-x new-y))
@@ -135,7 +138,7 @@
                                     (when (or (not (= dx 0)) (not (= dy 0)))
                                       (move-mob x y new-x new-y)))
                                   (do
-                                   ((. (combat) :maybe-attack-player) x y)
+                                   (combat.maybe-attack-player x y)
                                    (var moved false)
                                    (if (> player-x x)
                                        (set moved (move-mob x y (+ x 1) y))
@@ -165,10 +168,10 @@
                                   (set mob-count (+ mob-count 1)))))))))))
       (fn update [dt]
           (set current-time (+ current-time dt))
-          (when (>= current-time animation-duration)
-            (set current-time (- current-time animation-duration)))
+          (when (>= current-time globals.animation-duration)
+            (set current-time (- current-time globals.animation-duration)))
           (let [new-stance
-                (+ 1 (math.floor (* (/ current-time animation-duration)
+                (+ 1 (math.floor (* (/ current-time globals.animation-duration)
                                     animations-count)))]
             (when (not (= new-stance current-stance))
               (set current-stance new-stance)
@@ -176,8 +179,18 @@
       (fn update-world [set-mode]
           (update-state set-mode)
           (simulate)
-          (build-sprite-batch))
-      {:draw (fn [] (love.graphics.draw sprite-batch))
+          (build-sprite-batch)
+          (when (= 0 mob-count)
+            (update-status-message "You beat the dungeon.")
+            (let [win-music
+                  (love.audio.newSource "assets/sounds/riverside-ride.ogg" "stream")]
+              (: globals.ambient-music :stop)
+              (: win-music :setLooping true)
+              (: win-music :play))
+            (set-mode :credits)))
+      (fn draw []
+          (love.graphics.draw sprite-batch (utils.player-transform player)))
+      {:draw draw
        :update update
        :update-world update-world
        :describe describe

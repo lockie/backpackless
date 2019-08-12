@@ -1,4 +1,4 @@
-VERSION=0.1
+VERSION=0.3
 
 SOURCES := $(wildcard *.fnl)
 COMPILED := $(patsubst %.fnl,%.lua,$(SOURCES))
