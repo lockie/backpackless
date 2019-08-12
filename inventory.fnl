@@ -187,7 +187,12 @@
                  (update-status-message "Your weapon breaks.")
                  (set weapon nil))))))
     (fn describe []
-        (let [it (if (dual-wielding?) weapon item)]
+        (let [it
+              (if (dual-wielding?)
+                  (if (and item (= (. (item-class item) :class) :arrow))
+                      item
+                      weapon)
+                  item)]
           [[1 1 1 1]
            "BODY "
            (item-durability-color armor)
